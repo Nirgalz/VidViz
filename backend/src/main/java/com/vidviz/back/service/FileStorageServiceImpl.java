@@ -64,7 +64,7 @@ public class FileStorageServiceImpl implements FileStorageService {
         try {
             return Files.walk(this.root, 1).filter(path -> !path.equals(this.root)).map(this.root::relativize);
         } catch (IOException e) {
-            throw new RuntimeException("Could not load the files!");
+            return Stream.<Path>empty();
         }
     }
 }

@@ -14,15 +14,16 @@
         </div>
 
         <label class="btn btn-default">
-            <input type="file" ref="file" @change="selectFile" />
+            <input type="file" ref="file" @change="selectFile"/>
         </label>
 
-        <button class="btn btn-success" :disabled="!selectedFiles" @click="upload">
+        <b-btn variant="success" :disabled="!selectedFiles" @click="upload">
             Upload
-        </button>
+        </b-btn>
 
         <div class="alert alert-light" role="alert">{{ message }}</div>
 
+        <b-btn variant="danger" @click="deleteAll">Delete all files</b-btn>
         <div class="card">
             <div class="card-header">List of Files</div>
             <ul class="list-group list-group-flush">
@@ -79,11 +80,17 @@
 
                 this.selectedFiles = undefined;
             },
-            mounted() {
-                UploadService.getFiles().then(response => {
-                    this.fileInfos = response.data;
-                });
+            deleteAll() {
+                UploadService.deleteAll()
+                   .catch(()=>{
+                        this.message = "could not delete the files"
+                })
             }
+        },
+        mounted() {
+            UploadService.getFiles().then(response => {
+                this.fileInfos = response.data;
+            });
         }
     };
 </script>

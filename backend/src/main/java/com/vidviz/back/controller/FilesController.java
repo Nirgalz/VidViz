@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import com.vidviz.back.model.FileInfo;
 import com.vidviz.back.model.ResponseMessage;
 import com.vidviz.back.service.FileStorageService;
+import org.apache.juli.logging.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,11 +63,25 @@ public class FilesController {
         return ResponseEntity.status(HttpStatus.OK).body(fileInfos);
     }
 
-    @GetMapping("/files/{filename:.+}")
+    @GetMapping("api/files/{filename:.+}")
     @ResponseBody
     public ResponseEntity<Resource> getFile(@PathVariable String filename) {
         Resource file = storageService.load(filename);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").body(file);
+    }
+
+    @GetMapping("api/files/deleteall")
+    @ResponseBody
+    public ResponseEntity<ResponseMessage> deleteAll() {
+        try {
+            storageService.deleteAll();
+            LOG.info("All files deleted");
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("all files deleted"));
+        } catch (Exception e) {
+            LOG.info("Files could not be deleted");
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ResponseMessage("Files could not be deleted"));
+        }
+
     }
 }

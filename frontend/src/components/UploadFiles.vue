@@ -13,11 +13,22 @@
             </div>
         </div>
 
-        <label class="btn btn-default">
-            <input type="file" ref="file" @change="selectFile"/>
-        </label>
+<!--        <label class="btn btn-default">-->
+<!--            <input type="file" ref="file" @change="selectFile"/>-->
+<!--        </label>-->
 
-        <b-btn variant="success" :disabled="!selectedFiles" @click="upload">
+        <b-form-file
+                v-model="uploadFiles"
+                :state="Boolean(uploadFiles)"
+                placeholder="Choose a file or drop it here..."
+                drop-placeholder="Drop file here..."
+                multiple
+                ref="file"
+        ></b-form-file>
+        <div class="mt-3">Selected file: {{ selectedFiles ? selectedFiles.name : '' }}</div>
+<!--        <div class="mt-3">Selected file: {{ selectedFiles ? selectedFiles.name : '' }}</div>-->
+
+        <b-btn variant="success" :disabled="!uploadFiles" @click="upload">
             Upload
         </b-btn>
 
@@ -46,6 +57,7 @@
         name: "upload-files",
         data() {
             return {
+                uploadFiles: [],
                 selectedFiles: undefined,
                 currentFile: undefined,
                 progress: 0,
@@ -55,14 +67,9 @@
             };
         },
         methods: {
-            selectFile() {
-                this.selectedFiles = this.$refs.file.files;
-            },
             upload() {
                 this.progress = 0;
-
-                this.currentFile = this.selectedFiles.item(0);
-                UploadService.upload(this.currentFile, event => {
+                UploadService.upload(this.uploadFiles, event => {
                     this.progress = Math.round((100 * event.loaded) / event.total);
                 })
                     .then(response => {
@@ -82,9 +89,9 @@
             },
             deleteAll() {
                 UploadService.deleteAll()
-                    .then(UploadService.getFiles().then(response => {
-                        this.fileInfos = response.data;
-                    }))
+                    .then(
+                        this.fileInfos = []
+                    )
                    .catch(()=>{
                         this.message = "could not delete the files"
                 })

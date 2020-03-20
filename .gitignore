@@ -41,5 +41,6 @@ frontend/yarn-error.log
 frontend/yarn.lock
 security/target/
 selenium-debug.log
+uploads/
 
 !.mvn/wrapper/maven-wrapper.jar

@@ -82,6 +82,9 @@
             },
             deleteAll() {
                 UploadService.deleteAll()
+                    .then(UploadService.getFiles().then(response => {
+                        this.fileInfos = response.data;
+                    }))
                    .catch(()=>{
                         this.message = "could not delete the files"
                 })

@@ -3,10 +3,12 @@ package com.vidviz.back.controller;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.vidviz.back.model.FileInfo;
+import com.vidviz.back.model.File;
+import com.vidviz.back.model.Folder;
 import com.vidviz.back.model.ResponseMessage;
+import com.vidviz.back.service.FileService;
 import com.vidviz.back.service.FileStorageService;
-import org.apache.juli.logging.Log;
+import com.vidviz.back.service.FolderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,12 +37,24 @@ public class FilesController {
     @Autowired
     FileStorageService storageService;
 
+    @Autowired
+    FolderService folderService;
+
     @PostMapping("api/upload")
-    public ResponseEntity<ResponseMessage> uploadFile(@RequestParam("file") MultipartFile[] files) {
+    public ResponseEntity<ResponseMessage> uploadFile(@RequestParam("file") MultipartFile[] files, @RequestParam("pageName") String folderName) {
         String message = "";
         for (MultipartFile file : files) {
             try {
-                storageService.save(file);
+                storageService.save(file, folderName);
+
+                File savedFile = new File();
+                Folder folder = folderService.getFolderByName(folderName);
+                if (folder != null) {
+                    folder = new Folder();
+                    folder.setName(folderName);
+                }
+                savedFile.setName(file.getOriginalFilename());
+                savedFile.setFolder(folder);
                 LOG.info("upload from client");
                 message = "Uploaded the file successfully: " + file.getOriginalFilename();
 
@@ -53,18 +67,18 @@ public class FilesController {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
     }
 
-    @GetMapping("api/files")
-    public ResponseEntity<List<FileInfo>> getListFiles() {
-        List<FileInfo> fileInfos = storageService.loadAll().map(path -> {
-            String filename = path.getFileName().toString();
-            String url = MvcUriComponentsBuilder
-                    .fromMethodName(FilesController.class, "getFile", path.getFileName().toString()).build().toString();
-
-            return new FileInfo(filename, url);
-        }).collect(Collectors.toList());
-
-        return ResponseEntity.status(HttpStatus.OK).body(fileInfos);
-    }
+//    @GetMapping("api/files")
+//    public ResponseEntity<List<File>> getListFiles() {
+//        List<File> files = storageService.loadAll().map(path -> {
+//            String filename = path.getFileName().toString();
+//            String url = MvcUriComponentsBuilder
+//                    .fromMethodName(FilesController.class, "getFile", path.getFileName().toString()).build().toString();
+//
+//            return new File(filename, url);
+//        }).collect(Collectors.toList());
+//
+//        return ResponseEntity.status(HttpStatus.OK).body(files);
+//    }
 
     @GetMapping("api/files/{filename:.+}")
     @ResponseBody

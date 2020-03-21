@@ -16,37 +16,41 @@
 <!--        <label class="btn btn-default">-->
 <!--            <input type="file" ref="file" @change="selectFile"/>-->
 <!--        </label>-->
+        <b-container>
+            <b-form-file
+                    v-model="uploadFiles"
+                    :state="Boolean(uploadFiles)"
+                    placeholder="Choose a file or drop it here..."
+                    drop-placeholder="Drop file here..."
+                    multiple
+                    ref="file"
+            ></b-form-file>
 
-        <b-form-file
-                v-model="uploadFiles"
-                :state="Boolean(uploadFiles)"
-                placeholder="Choose a file or drop it here..."
-                drop-placeholder="Drop file here..."
-                multiple
-                ref="file"
-        ></b-form-file>
-        <div class="mt-3">Selected file: {{ selectedFiles ? selectedFiles.name : '' }}</div>
-<!--        <div class="mt-3">Selected file: {{ selectedFiles ? selectedFiles.name : '' }}</div>-->
+            <b-form-input v-model="pageName" placeholder="Enter the page name"></b-form-input>
 
-        <b-btn variant="success" :disabled="!uploadFiles" @click="upload">
-            Upload
-        </b-btn>
+            <!--        <div class="mt-3">Selected file: {{ selectedFiles ? selectedFiles.name : '' }}</div>-->
 
-        <div class="alert alert-light" role="alert">{{ message }}</div>
+            <b-btn variant="success" :disabled="isUploadBtnAvailable()" @click="upload">
+                Upload
+            </b-btn>
 
-        <b-btn variant="danger" @click="deleteAll">Delete all files</b-btn>
-        <div class="card">
-            <div class="card-header">List of Files</div>
-            <ul class="list-group list-group-flush">
-                <li
-                        class="list-group-item"
-                        v-for="(file, index) in fileInfos"
-                        :key="index"
-                >
-                    <a :href="file.url">{{ file.name }}</a>
-                </li>
-            </ul>
-        </div>
+            <div class="alert alert-light" role="alert">{{ message }}</div>
+
+            <b-btn variant="danger" @click="deleteAll">Delete all files</b-btn>
+            <div class="card">
+                <div class="card-header">List of Files</div>
+                <ul class="list-group list-group-flush">
+                    <li
+                            class="list-group-item"
+                            v-for="(file, index) in files"
+                            :key="index"
+                    >
+                        <a :href="file.url">{{ file.name }}</a>
+                    </li>
+                </ul>
+            </div>
+        </b-container>
+
     </div>
 </template>
 
@@ -58,18 +62,22 @@
         data() {
             return {
                 uploadFiles: [],
+                pageName: "",
                 selectedFiles: undefined,
                 currentFile: undefined,
                 progress: 0,
                 message: "",
 
-                fileInfos: []
+                files: []
             };
         },
         methods: {
+            isUploadBtnAvailable() {
+                return !this.uploadFiles.length > 0 || this.pageName === "";
+            },
             upload() {
                 this.progress = 0;
-                UploadService.upload(this.uploadFiles, event => {
+                UploadService.upload(this.uploadFiles, this.pageName, event => {
                     this.progress = Math.round((100 * event.loaded) / event.total);
                 })
                     .then(response => {
@@ -77,7 +85,7 @@
                         return UploadService.getFiles();
                     })
                     .then(files => {
-                        this.fileInfos = files.data;
+                        this.files = files.data;
                     })
                     .catch(() => {
                         this.progress = 0;
@@ -90,7 +98,7 @@
             deleteAll() {
                 UploadService.deleteAll()
                     .then(
-                        this.fileInfos = []
+                        this.files = []
                     )
                    .catch(()=>{
                         this.message = "could not delete the files"
@@ -99,12 +107,26 @@
         },
         mounted() {
             UploadService.getFiles().then(response => {
-                this.fileInfos = response.data;
+                this.files = response.data;
             });
         }
     };
 </script>
 
 <style scoped>
+    ::-webkit-input-placeholder {
+        text-align: center;
+    }
 
+    :-moz-placeholder { /* Firefox 18- */
+        text-align: center;
+    }
+
+    ::-moz-placeholder {  /* Firefox 19+ */
+        text-align: center;
+    }
+
+    :-ms-input-placeholder {
+        text-align: center;
+    }
 </style>

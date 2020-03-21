@@ -4,10 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.vidviz.back.model.File;
-import com.vidviz.back.model.Folder;
-import com.vidviz.back.model.FolderFront;
-import com.vidviz.back.model.ResponseMessage;
+import com.vidviz.back.model.*;
 import com.vidviz.back.service.FileService;
 import com.vidviz.back.service.FileStorageService;
 import com.vidviz.back.service.FolderService;
@@ -84,6 +81,21 @@ public class FilesController {
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(foldersFront);
+    }
+
+    @GetMapping("api/folder/{folder:.+}")
+    @ResponseBody
+    public ResponseEntity<List<FileFront>> getFilesByFolder(@PathVariable String folder) {
+        List<FileFront> filesFront = new ArrayList<>();
+        List<File> files = folderService.getFolderByName(folder).getFiles();
+        for (File f : files) {
+            filesFront.add(
+                    new FileFront(f.getName(),
+                            MvcUriComponentsBuilder
+                   .fromMethodName(FilesController.class, "getFile", f.getName()).build().toString()));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(filesFront);
     }
 
 

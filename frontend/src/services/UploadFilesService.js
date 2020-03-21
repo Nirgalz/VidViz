@@ -22,8 +22,8 @@ class UploadFilesService {
         return http.get("/folders");
     }
 
-    getFiles() {
-        return http.get("/files");
+    getFiles(selectedFolder) {
+        return http.get("/folder/"+selectedFolder);
     }
 
     deleteAll() {

@@ -36,6 +36,10 @@ public class Folder {
         files.add(file);
     }
 
+    public List<File> getFiles() {
+        return files;
+    }
+
     public void removeFile(File file) {
         files.remove(file);
     }

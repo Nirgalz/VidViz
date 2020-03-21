@@ -24,6 +24,10 @@ public class Folder {
     )
     private List<File> files = new ArrayList<>();
 
+    public int getNumberOfFiles() {
+        return files.size();
+    }
+
     public void addAllFiles(List<File> files) {
         files.addAll(files);
     }

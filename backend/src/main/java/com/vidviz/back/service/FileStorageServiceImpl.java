@@ -37,7 +37,7 @@ public class FileStorageServiceImpl implements FileStorageService {
             if (Files.notExists(folder)) {
                 Files.createDirectory(folder);
             }
-            Files.copy(file.getInputStream(), folder.resolve(Paths.get(pageName) + file.getOriginalFilename()));
+            Files.copy(file.getInputStream(), folder.resolve(file.getOriginalFilename()));
         } catch (Exception e) {
             throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
         }

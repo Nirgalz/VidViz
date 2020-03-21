@@ -1,10 +1,11 @@
 package com.vidviz.back.model;
 
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.Set;
 
 @Entity(name = "file")
 @Table(name = "files")
@@ -16,6 +17,7 @@ public class File {
     private String name;
     private String url;
     private String jsonUrl;
+    @CreatedDate
     private Date created;
 
     @ManyToOne(fetch = FetchType.LAZY)

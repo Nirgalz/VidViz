@@ -37,28 +37,38 @@
             <div class="alert alert-light" role="alert">{{ message }}</div>
 
             <b-btn variant="danger" @click="deleteAll">Delete all files</b-btn>
-            <div class="card">
-                <div class="card-header">List of Files</div>
-                <ul class="list-group list-group-flush">
-                    <li
-                            class="list-group-item"
-                            v-for="(file, index) in files"
-                            :key="index"
-                    >
-                        <a :href="file.url">{{ file.name }}</a>
-                    </li>
-                </ul>
-            </div>
+<!--            <div class="card">-->
+<!--                <div class="card-header">List of Files</div>-->
+<!--                <ul class="list-group list-group-flush">-->
+<!--                    <li-->
+<!--                            class="list-group-item"-->
+<!--                            v-for="(file, index) in files"-->
+<!--                            :key="index"-->
+<!--                    >-->
+<!--                        <a :href="file.url">{{ file.name }}</a>-->
+<!--                    </li>-->
+<!--                </ul>-->
+<!--            </div>-->
         </b-container>
+
+        <b-row class="text-center">
+            <b-col>
+                <FolderList></FolderList>
+            </b-col>
+            <b-col cols="8">2 of 3 (wider)</b-col>
+            <b-col>3 of 3</b-col>
+        </b-row>
 
     </div>
 </template>
 
 <script>
     import UploadService from "../services/UploadFilesService";
+    import FolderList from "./FolderList";
 
     export default {
         name: "upload-files",
+        components: {FolderList},
         data() {
             return {
                 uploadFiles: [],
@@ -82,7 +92,7 @@
                 })
                     .then(response => {
                         this.message = response.data.message;
-                        return UploadService.getFiles();
+                        //return UploadService.getFiles();
                     })
                     .then(files => {
                         this.files = files.data;
@@ -104,12 +114,13 @@
                         this.message = "could not delete the files"
                 })
             }
-        },
-        mounted() {
-            UploadService.getFiles().then(response => {
-                this.files = response.data;
-            });
         }
+        // ,
+        // mounted() {
+        //     UploadService.getFiles().then(response => {
+        //         this.files = response.data;
+        //     });
+        // }
     };
 </script>
 

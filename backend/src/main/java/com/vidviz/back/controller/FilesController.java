@@ -1,10 +1,12 @@
 package com.vidviz.back.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.vidviz.back.model.File;
 import com.vidviz.back.model.Folder;
+import com.vidviz.back.model.FolderFront;
 import com.vidviz.back.model.ResponseMessage;
 import com.vidviz.back.service.FileService;
 import com.vidviz.back.service.FileStorageService;
@@ -40,21 +42,27 @@ public class FilesController {
     @Autowired
     FolderService folderService;
 
+    @Autowired
+    FileService fileService;
+
     @PostMapping("api/upload")
     public ResponseEntity<ResponseMessage> uploadFile(@RequestParam("file") MultipartFile[] files, @RequestParam("pageName") String folderName) {
         String message = "";
+        Folder folder = folderService.getFolderByName(folderName);
+        if (folder == null) {
+            folder = new Folder();
+            folder.setName(folderName);
+            folderService.createFolder(folder);
+        }
         for (MultipartFile file : files) {
             try {
-                storageService.save(file, folderName);
-
                 File savedFile = new File();
-                Folder folder = folderService.getFolderByName(folderName);
-                if (folder != null) {
-                    folder = new Folder();
-                    folder.setName(folderName);
-                }
+
                 savedFile.setName(file.getOriginalFilename());
                 savedFile.setFolder(folder);
+
+                folder.addFile(fileService.createFile(savedFile));
+                storageService.save(file, folderName);
                 LOG.info("upload from client");
                 message = "Uploaded the file successfully: " + file.getOriginalFilename();
 
@@ -66,6 +74,18 @@ public class FilesController {
         }
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
     }
+
+    @GetMapping("api/folders")
+    public ResponseEntity<List<FolderFront>> getListFolders() {
+        List<Folder> folders = folderService.findAll();
+        List<FolderFront> foldersFront = new ArrayList<>();
+        for (Folder folder : folders) {
+            foldersFront.add(new FolderFront(folder.getName(), folder.getNumberOfFiles()));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(foldersFront);
+    }
+
 
 //    @GetMapping("api/files")
 //    public ResponseEntity<List<File>> getListFiles() {

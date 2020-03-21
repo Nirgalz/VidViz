@@ -1,15 +1,17 @@
+DROP TABLE IF EXISTS `files`;
 CREATE TABLE `files` (
 	`id` INT NOT NULL AUTO_INCREMENT,
-	`name` INT(255) NOT NULL,
+	`name` VARCHAR(255) NOT NULL,
 	`json` varchar(255),
-	`created` DATETIME NOT NULL,
+	`created` DATETIME,
 	PRIMARY KEY (`id`)
 );
 
+DROP TABLE IF EXISTS `folders`;
 CREATE TABLE `folders` (
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`name` varchar(255) NOT NULL,
-	`files` INT NOT NULL,
+	`files` INT,
 	PRIMARY KEY (`id`)
 );
 

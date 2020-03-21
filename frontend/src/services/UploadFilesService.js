@@ -18,6 +18,10 @@ class UploadFilesService {
         });
     }
 
+    getFolders() {
+        return http.get("/folders");
+    }
+
     getFiles() {
         return http.get("/files");
     }

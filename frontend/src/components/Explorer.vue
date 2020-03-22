@@ -6,6 +6,13 @@
             </b-col>
             <b-col cols="8">
                 <b-table  hover :items="files"></b-table>
+                <div v-for="item in files" :key="item.name">
+                    <video-player
+                            ref="videoPlayer"
+                            :options="{sources:[{src:item.url}]}"
+                    >
+                    </video-player>
+                </div>
             </b-col>
         </b-row>
 

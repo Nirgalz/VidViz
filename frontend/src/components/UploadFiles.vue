@@ -17,23 +17,27 @@
 <!--            <input type="file" ref="file" @change="selectFile"/>-->
 <!--        </label>-->
         <b-container>
-            <b-form-file
-                    v-model="uploadFiles"
-                    :state="Boolean(uploadFiles)"
-                    placeholder="Choose a file or drop it here..."
-                    drop-placeholder="Drop file here..."
-                    multiple
-                    ref="file"
-            ></b-form-file>
+            <b-row>
+                <b-col>
+                    <b-form-file
+                            v-model="uploadFiles"
+                            :state="Boolean(uploadFiles)"
+                            placeholder="Choose a file or drop it here..."
+                            drop-placeholder="Drop file here..."
+                            multiple
+                            ref="file"
+                    ></b-form-file>
+                </b-col>
+                <b-col>
+                    <b-form-input v-model="pageName" placeholder="Enter the page name"></b-form-input>
 
-            <b-form-input v-model="pageName" placeholder="Enter the page name"></b-form-input>
+                    <!--        <div class="mt-3">Selected file: {{ selectedFiles ? selectedFiles.name : '' }}</div>-->
 
-            <!--        <div class="mt-3">Selected file: {{ selectedFiles ? selectedFiles.name : '' }}</div>-->
-
-            <b-btn variant="success" :disabled="isUploadBtnAvailable()" @click="upload">
-                Upload
-            </b-btn>
-
+                    <b-btn variant="success" :disabled="isUploadBtnAvailable()" @click="upload">
+                        Upload
+                    </b-btn>
+                </b-col>
+            </b-row>
             <div class="alert alert-light" role="alert">{{ message }}</div>
 
 <!--            <b-btn variant="danger" @click="deleteAll">Delete all files</b-btn>-->

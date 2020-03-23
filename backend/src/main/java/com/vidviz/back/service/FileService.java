@@ -13,7 +13,7 @@ public class FileService {
     @Autowired
     FileRepository fileRepository;
 
-    public Video createFile(Video video) {
+    public Video saveVideo(Video video) {
         return fileRepository.save(video);
     }
 
@@ -23,5 +23,9 @@ public class FileService {
 
     public Video findByName(String name) {
         return fileRepository.findByName(name);
+    }
+
+    public Video findByNameAndFolderName(String name, String folder){
+        return fileRepository.findByNameAndFolderName(name, folder);
     }
 }

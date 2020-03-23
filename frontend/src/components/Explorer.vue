@@ -16,12 +16,14 @@
                             ref="videoPlayer"
                             :options="{
                         sources:[{src:item.url}],
-                        controls:false
+                        controls:false,
+                        width: 150,
+                        height:150
                     }"
                     >
                     </video-player>
                 </div>
-                <b-button href="#" variant="success">get JSON {{index}}</b-button>
+                <b-btn variant="success" size="sm" :href="item.jsonUrl">get JSON {{index}}</b-btn>
             </b-card>
         </b-row>
 

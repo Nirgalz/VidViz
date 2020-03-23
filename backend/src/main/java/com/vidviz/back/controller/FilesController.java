@@ -67,7 +67,7 @@ public class FilesController {
                     savedVideo.setName(file.getOriginalFilename());
                     savedVideo.setFolder(folder);
 
-                    folder.addFile(fileService.createFile(savedVideo));
+                    folder.addFile(fileService.saveVideo(savedVideo));
                 }
                 LOG.info("upload from client");
                 message = "Uploaded the file successfully: " + file.getOriginalFilename();
@@ -81,7 +81,12 @@ public class FilesController {
             }
         }
         for (MultipartFile jsonFile : jsonFiles) {
-            fileService.findByName(jsonFile.getName()).setJson(jsonFile.getName());
+            Video video =  fileService.findByNameAndFolderName(jsonFile.getOriginalFilename()
+                    .replace("jsonoutput","ffmpegencodevideo")
+                    .replace(".json",".mp4"), folderName);
+            video.setJson(jsonFile.getOriginalFilename());
+            fileService.saveVideo(video);
+
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));

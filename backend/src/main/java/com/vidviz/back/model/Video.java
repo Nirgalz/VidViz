@@ -9,14 +9,14 @@ import java.util.Date;
 
 @Entity(name = "file")
 @Table(name = "files")
-public class File {
+public class Video {
     @javax.persistence.Id
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private String url;
-    private String jsonUrl;
+    private String json;
     @CreatedDate
     private Date created;
 
@@ -31,12 +31,12 @@ public class File {
         this.folder = folder;
     }
 
-    public String getJsonUrl() {
-        return jsonUrl;
+    public String getJson() {
+        return json;
     }
 
-    public void setJsonUrl(String jsonUrl) {
-        this.jsonUrl = jsonUrl;
+    public void setJson(String jsonUrl) {
+        this.json = jsonUrl;
     }
 
     public Date getCreated() {

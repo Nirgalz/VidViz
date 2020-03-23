@@ -22,34 +22,34 @@ public class Folder {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    private List<File> files = new ArrayList<>();
+    private List<Video> videos = new ArrayList<>();
 
     public int getNumberOfFiles() {
-        return files.size();
+        return videos.size();
     }
 
-    public void addAllFiles(List<File> files) {
-        files.addAll(files);
+    public void addAllFiles(List<Video> videos) {
+        videos.addAll(videos);
     }
 
-    public void addFile(File file) {
-        files.add(file);
+    public void addFile(Video video) {
+        videos.add(video);
     }
 
-    public List<File> getFiles() {
-        return files;
+    public List<Video> getVideos() {
+        return videos;
     }
 
-    public void removeFile(File file) {
-        files.remove(file);
+    public void removeFile(Video video) {
+        videos.remove(video);
     }
 
-    public void removeAllFiles(List<File> files) {
-        files.removeAll(files);
+    public void removeAllFiles(List<Video> videos) {
+        videos.removeAll(videos);
     }
 
     public void emptyFileList() {
-        files.clear();
+        videos.clear();
     }
 
     public String getName() {

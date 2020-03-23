@@ -2,12 +2,17 @@
     <div>
         <b-row class="text-center">
             <b-col cols="2">
-                <b-table  hover :items="folders" @row-clicked="(item, index, event) => loadFiles(item)"></b-table>
+                <b-table hover :items="folders" @row-clicked="(item, index, event) => loadFiles(item)"></b-table>
             </b-col>
             <b-col>
-                <b-btn variant="success" @click="playPauseVideos"> > </b-btn>
-                <div v-for="item in files" :key="item.name">
+
+            </b-col>
+        </b-row>
+        <b-row class="videoContainer">
+            <b-card v-for="(item, index) in files" :key="item.name" class="videoBox">
+                <div @click="playPauseVideos">
                     <video-player
+                            class="video-player-box"
                             ref="videoPlayer"
                             :options="{
                         sources:[{src:item.url}],
@@ -16,14 +21,16 @@
                     >
                     </video-player>
                 </div>
-            </b-col>
+                <b-button href="#" variant="success">get JSON {{index}}</b-button>
+            </b-card>
         </b-row>
 
     </div>
 </template>
 
 <script>
-import UploadService from "../services/UploadFilesService";
+    import UploadService from "../services/UploadFilesService";
+
     export default {
         name: "Explorer",
         data() {
@@ -37,14 +44,12 @@ import UploadService from "../services/UploadFilesService";
         methods: {
             playPauseVideos() {
                 this.players = this.$refs.videoPlayer;
-                console.log(this.players);
-                for ( let i = 0 ; i < this.players.length ; i++) {
-                    console.log(this.players[i].player);
+                for (let i = 0; i < this.players.length; i++) {
                     this.players[i].player.play();
                 }
             },
-            selectFolder(item) {
-                this.selectedFolder = item.name;
+            selectVideo(index) {
+                console.log(index);
             },
             loadFiles(item) {
                 UploadService.getFiles(item.name).then(response => {
@@ -61,5 +66,11 @@ import UploadService from "../services/UploadFilesService";
 </script>
 
 <style scoped>
+    .videoContainer {
+        display: flex;
+    }
 
+    .videoBox {
+        flex-direction: row;
+    }
 </style>

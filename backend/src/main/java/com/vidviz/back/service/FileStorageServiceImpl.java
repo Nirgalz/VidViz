@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 import com.vidviz.back.model.File;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -44,19 +45,17 @@ public class FileStorageServiceImpl implements FileStorageService {
     }
 
     @Override
-    public Resource load(String filename) {
-        try {
-            Path file = root.resolve(filename);
-            Resource resource = new UrlResource(file.toUri());
+    public FileSystemResource load(String filename, String folderName) {
+        Path folder = Paths.get("uploads/"+folderName);
+
+            Path file = folder.resolve(filename);
+        FileSystemResource resource = new FileSystemResource(file);
 
             if (resource.exists() || resource.isReadable()) {
                 return resource;
             } else {
                 throw new RuntimeException("Could not read the file!");
             }
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Error: " + e.getMessage());
-        }
     }
 
     @Override

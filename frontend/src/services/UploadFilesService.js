@@ -29,5 +29,9 @@ class UploadFilesService {
     deleteAll() {
         return http.get("files/deleteall");
     }
+
+    getFile(folderName, fileName) {
+        return http.get("files/"+folderName+"/"+fileName);
+    }
 }
 export default new UploadFilesService();

@@ -1,5 +1,7 @@
 package com.vidviz.back.controller;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -8,9 +10,11 @@ import com.vidviz.back.model.*;
 import com.vidviz.back.service.FileService;
 import com.vidviz.back.service.FileStorageService;
 import com.vidviz.back.service.FolderService;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,6 +29,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletResponse;
 
 
 @Controller
@@ -41,6 +47,9 @@ public class FilesController {
 
     @Autowired
     FileService fileService;
+
+    @Autowired
+    ServletContext servletContext;
 
     @PostMapping("api/upload")
     public ResponseEntity<ResponseMessage> uploadFile(@RequestParam("file") MultipartFile[] files, @RequestParam("pageName") String folderName) {
@@ -88,13 +97,9 @@ public class FilesController {
     public ResponseEntity<List<FileFront>> getFilesByFolder(@PathVariable String folder) {
         List<FileFront> filesFront = new ArrayList<>();
         List<File> files = folderService.getFolderByName(folder).getFiles();
-        for (File f : files) {
-            filesFront.add(
-                    new FileFront(f.getName(),
-                            MvcUriComponentsBuilder
-                   .fromMethodName(FilesController.class, "getFile", f.getName()).build().toString()));
+        for (File file : files) {
+            filesFront.add(new FileFront(file.getName(), "http://localhost:8080/uploads/"+folder+"/"+file.getName()));
         }
-
         return ResponseEntity.status(HttpStatus.OK).body(filesFront);
     }
 
@@ -112,12 +117,18 @@ public class FilesController {
 //        return ResponseEntity.status(HttpStatus.OK).body(files);
 //    }
 
-    @GetMapping("api/files/{filename:.+}")
+    @GetMapping("api/files/{foldername:.+}/{filename:.+}")
     @ResponseBody
-    public ResponseEntity<Resource> getFile(@PathVariable String filename) {
-        Resource file = storageService.load(filename);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").body(file);
+    public void getFile(@PathVariable String filename, @PathVariable String foldername, HttpServletResponse response) {
+        try {
+            InputStream inputStream = storageService.load(filename, foldername).getInputStream();
+            IOUtils.copy(inputStream, response.getOutputStream());
+            response.setContentType("video/mp4");
+            response.flushBuffer();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @GetMapping("api/files/deleteall")

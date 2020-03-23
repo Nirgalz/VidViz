@@ -5,7 +5,6 @@
                 <b-table  hover :items="folders" @row-clicked="(item, index, event) => loadFiles(item)"></b-table>
             </b-col>
             <b-col cols="8">
-                <b-table  hover :items="files"></b-table>
                 <div v-for="item in files" :key="item.name">
                     <video-player
                             ref="videoPlayer"
@@ -27,7 +26,7 @@ import UploadService from "../services/UploadFilesService";
             return {
                 folders: [],
                 files: [],
-                selectedFolder: ""
+                selectedFolder: "",
             }
         },
         methods: {

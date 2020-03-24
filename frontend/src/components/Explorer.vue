@@ -1,8 +1,6 @@
 <template>
     <div>
-        <b-row class="text-center">
-                <b-table hover :items="folders" @row-clicked="(item, index, event) => loadFilesToPage(item)"></b-table>
-        </b-row>
+        <b-table hover :items="folders" @row-clicked="(item, index, event) => loadFilesToPage(item)"></b-table>
     </div>
 </template>
 

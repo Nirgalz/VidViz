@@ -6,6 +6,7 @@ class UploadFilesService {
 
         for (let i = 0 ; i < files.length ; i++) {
             formData.append("file", files[i]);
+
         }
 
         formData.append("pageName", page);
@@ -14,8 +15,10 @@ class UploadFilesService {
             headers: {
                 "Content-Type": "multipart/form-data"
             },
+            maxContentLength: 100000000,
+            maxBodyLength: 1000000000,
             onUploadProgress
-        });
+        })
     }
 
     getFolders() {

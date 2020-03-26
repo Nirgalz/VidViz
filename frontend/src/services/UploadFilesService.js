@@ -29,6 +29,17 @@ class UploadFilesService {
         return http.get("/folder/"+selectedFolder);
     }
 
+    deleteFolder(folderName) {
+        return http.get("/action/folders/delete/"+folderName);
+    }
+
+    editFolder(oldName, newName) {
+        let formData = new FormData();
+        formData.append("oldName", oldName);
+        formData.append("newName", newName);
+        return http.post("/action/folders/rename/", formData)
+    }
+
     deleteAll() {
         return http.get("files/deleteall");
     }

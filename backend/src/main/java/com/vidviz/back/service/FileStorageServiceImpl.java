@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.stream.Stream;
 
 import org.springframework.core.io.FileSystemResource;
@@ -42,16 +43,27 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     @Override
     public FileSystemResource load(String filename, String folderName) {
-        Path folder = Paths.get("uploads/"+folderName);
+        Path folder = Paths.get("uploads/" + folderName);
 
-            Path file = folder.resolve(filename);
+        Path file = folder.resolve(filename);
         FileSystemResource resource = new FileSystemResource(file);
 
-            if (resource.exists() || resource.isReadable()) {
-                return resource;
-            } else {
-                throw new RuntimeException("Could not read the file!");
-            }
+        if (resource.exists() || resource.isReadable()) {
+            return resource;
+        } else {
+            throw new RuntimeException("Could not read the file!");
+        }
+    }
+
+    @Override
+    public void editFolderName(String oldName, String newName) throws IOException {
+
+        Files.move(Paths.get("uploads/" + oldName), Paths.get("uploads/" + newName));
+    }
+
+    @Override
+    public void deleteFolder(String folder) throws IOException {
+        FileSystemUtils.deleteRecursively(Paths.get("uploads/" + folder));
     }
 
     @Override

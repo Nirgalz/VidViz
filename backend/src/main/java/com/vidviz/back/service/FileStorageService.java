@@ -1,5 +1,6 @@
 package com.vidviz.back.service;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
@@ -17,4 +18,8 @@ public interface FileStorageService {
     public void deleteAll();
 
     public Stream<Path> loadAll();
+
+    void deleteFolder(String folder) throws IOException;
+
+    void editFolderName(String oldName, String newName) throws IOException;
 }

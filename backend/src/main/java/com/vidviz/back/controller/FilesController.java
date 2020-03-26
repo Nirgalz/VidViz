@@ -54,7 +54,7 @@ public class FilesController {
         if (folder == null) {
             folder = new Folder();
             folder.setName(folderName);
-            folderService.createFolder(folder);
+            folderService.saveFolder(folder);
         }
         List<MultipartFile> jsonFiles = new ArrayList<>();
         for (MultipartFile file : files) {
@@ -116,19 +116,35 @@ public class FilesController {
         return ResponseEntity.status(HttpStatus.OK).body(filesFront);
     }
 
+    @PostMapping("api/action/folders/rename/")
+    public ResponseEntity<ResponseMessage> renameFolder(@RequestParam("oldName") String oldName, @RequestParam("newName") String newName) {
 
-//    @GetMapping("api/files")
-//    public ResponseEntity<List<File>> getListFiles() {
-//        List<File> files = storageService.loadAll().map(path -> {
-//            String filename = path.getFileName().toString();
-//            String url = MvcUriComponentsBuilder
-//                    .fromMethodName(FilesController.class, "getFile", path.getFileName().toString()).build().toString();
-//
-//            return new File(filename, url);
-//        }).collect(Collectors.toList());
-//
-//        return ResponseEntity.status(HttpStatus.OK).body(files);
-//    }
+        try {
+            storageService.editFolderName(oldName, newName);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Folder folder = folderService.getFolderByName(oldName);
+        folder.setName(newName);
+        folderService.saveFolder(folder);
+
+
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(oldName + " has been renamed in " + newName));
+    }
+
+    @GetMapping("api/action/folders/delete/{folder:.+}")
+    @ResponseBody
+    public ResponseEntity<String> deleteFolder(@PathVariable String folder) {
+        try {
+            storageService.deleteFolder(folder);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        folderService.deleteFolder(folder);
+        return ResponseEntity.status(HttpStatus.OK).body("folder deleted");
+    }
+
 
     @GetMapping("api/files/{foldername:.+}/{filename:.+}")
     @ResponseBody

@@ -19,7 +19,11 @@ public class FolderService {
 
     public List<Folder> findAll() { return folderRepository.findAll(); }
 
-    public Folder createFolder(Folder folder) {
+    public Folder saveFolder(Folder folder) {
         return folderRepository.save(folder);
+    }
+
+    public void deleteFolder(String folder) {
+        folderRepository.delete(folderRepository.findByName(folder));
     }
 }

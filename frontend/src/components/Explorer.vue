@@ -17,7 +17,6 @@
         </b-table>
         <b-modal id="modal-editFolder" title="Edit" @ok="editItem">
             <b-form-input v-model="editNewName" placeholder="Enter a new folder name"></b-form-input>
-
         </b-modal>
     </div>
 </template>

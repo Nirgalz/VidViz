@@ -1,6 +1,6 @@
 <template>
     <div>
-<!--        <b-form-input @change="changeVideoSize" v-model="videoSize" type="range" min="0" max="100"></b-form-input>-->
+        <b-form-input @change="changeVideoSize" v-model="videoSize" type="range" min="0" max="100"></b-form-input>
         <b-row class="videoContainer">
             <b-card v-for="(item) in files" :key="item.name" class="videoBox">
                 <div @click="playPauseVideos">
@@ -46,8 +46,8 @@
             changeVideoSize() {
                 console.log(this.videoSize)
                 for (let i = 0 ; i < this.players.length ; i++){
-                    this.players[i].player.width(2 * this.videoSize);
-                    this.player[i].player.height(2 * this.videoSize);
+                    this.players[i].player.width(10 * this.videoSize);
+                    this.players[i].player.height(10 * this.videoSize);
                 }
             },
         },

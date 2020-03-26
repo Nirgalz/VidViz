@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS `files`;
+# DROP TABLE IF EXISTS `files`;
 CREATE TABLE `files` (
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`name` VARCHAR(255) NOT NULL,
@@ -7,7 +7,7 @@ CREATE TABLE `files` (
 	PRIMARY KEY (`id`)
 );
 
-DROP TABLE IF EXISTS `folders`;
+# DROP TABLE IF EXISTS `folders`;
 CREATE TABLE `folders` (
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`name` varchar(255) NOT NULL,

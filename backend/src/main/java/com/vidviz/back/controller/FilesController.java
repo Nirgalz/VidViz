@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 
 
 @RestController
-//@CrossOrigin("http://localhost:8081")
+@CrossOrigin("http://localhost:8081")
 public class FilesController {
 
     private static final Logger LOG = LoggerFactory.getLogger(FilesController.class);

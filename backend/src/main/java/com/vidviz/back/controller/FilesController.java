@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
@@ -41,6 +42,22 @@ public class FilesController {
 
     @Autowired
     ServletContext servletContext;
+
+    @PostMapping("api/uploadfile")
+    public ResponseEntity<ResponseMessage> uploadFileByFile(
+            final HttpServletRequest request,
+            final HttpServletResponse response) {
+        request.getHeader("content-range");
+        request.getHeader("content-length");
+        request.getHeader("content-disposition");
+        try {
+            request.getInputStream(); //actual content.
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("okokokokokok"));
+    }
 
     @PostMapping("api/upload")
     public ResponseEntity<ResponseMessage> uploadFile(@RequestParam("file") MultipartFile[] files, @RequestParam("pageName") String folderName) {

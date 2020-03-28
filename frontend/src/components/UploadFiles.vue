@@ -13,9 +13,6 @@
             </div>
         </div>
 
-<!--        <label class="btn btn-default">-->
-<!--            <input type="file" ref="file" @change="selectFile"/>-->
-<!--        </label>-->
         <b-container>
             <b-row>
                 <b-col>
@@ -25,36 +22,28 @@
                             placeholder="Choose a file or drop it here..."
                             drop-placeholder="Drop file here..."
                             multiple
-                            ref="file"
+                            plain
+                            ref="files-input"
                     ></b-form-file>
+                    <ul>
+                        <li v-for="file in uploadFiles" :key="file.message">
+                            {{file.name}}
+                        </li>
+                    </ul>
                 </b-col>
                 <b-col>
                     <b-form-input v-model="pageName" placeholder="Enter the page name"></b-form-input>
 
-                    <!--        <div class="mt-3">Selected file: {{ selectedFiles ? selectedFiles.name : '' }}</div>-->
 
                     <b-btn variant="success" :disabled="isUploadBtnAvailable()" @click="upload">
                         Upload
                     </b-btn>
+                    <div class="alert alert-light" role="alert">{{ message }}</div>
                 </b-col>
             </b-row>
-            <div class="alert alert-light" role="alert">{{ message }}</div>
 
-<!--            <b-btn variant="danger" @click="deleteAll">Delete all files</b-btn>-->
-<!--            <div class="card">-->
-<!--                <div class="card-header">List of Files</div>-->
-<!--                <ul class="list-group list-group-flush">-->
-<!--                    <li-->
-<!--                            class="list-group-item"-->
-<!--                            v-for="(file, index) in files"-->
-<!--                            :key="index"-->
-<!--                    >-->
-<!--                        <a :href="file.url">{{ file.name }}</a>-->
-<!--                    </li>-->
-<!--                </ul>-->
-<!--            </div>-->
+
         </b-container>
-
 
 
     </div>
@@ -69,17 +58,20 @@
             return {
                 uploadFiles: [],
                 pageName: "",
-                selectedFiles: undefined,
                 currentFile: undefined,
                 progress: 0,
                 message: "",
 
-                files: []
             };
         },
         methods: {
             isUploadBtnAvailable() {
                 return !this.uploadFiles.length > 0 || this.pageName === "";
+            },
+            refreshFilesList(){
+                console.log(this.uploadFiles);
+               // this.$refs['files-input'].reset();
+
             },
             upload() {
                 this.progress = 0;
@@ -96,27 +88,12 @@
                     .catch(() => {
                         this.progress = 0;
                         this.message = "Could not upload the file!";
-                        this.currentFile = undefined;
+
                     });
 
-                this.selectedFiles = undefined;
-            },
-            deleteAll() {
-                UploadService.deleteAll()
-                    .then(
-                        this.files = []
-                    )
-                   .catch(()=>{
-                        this.message = "could not delete the files"
-                })
+                this.uploadFiles = [];
             }
         }
-        // ,
-        // mounted() {
-        //     UploadService.getFiles().then(response => {
-        //         this.files = response.data;
-        //     });
-        // }
     };
 </script>
 
@@ -129,7 +106,7 @@
         text-align: center;
     }
 
-    ::-moz-placeholder {  /* Firefox 19+ */
+    ::-moz-placeholder { /* Firefox 19+ */
         text-align: center;
     }
 

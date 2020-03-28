@@ -1,22 +1,28 @@
 <template>
     <div>
+        <div class="filesActions">
+            <b-btn variant="success" @click="selectedAction = 'upload'">
+                Upload
+                <b-icon-upload></b-icon-upload>
+            </b-btn>
+            |
+            <b-btn variant="info" @click="selectedAction = 'explorer'">
+                Explorer
+                <b-icon-folder></b-icon-folder>
+            </b-btn>
+        </div>
 
-        <b-btn variant="success" @click="selectedAction = 'upload'">
-            <b-icon-upload></b-icon-upload>
-        </b-btn>
-        |
-        <b-btn variant="info" @click="selectedAction = 'explorer'">
-            <b-icon-folder></b-icon-folder>
-        </b-btn>
-        <transition name="component-fade" mode="in-out">
-            <upload-files v-if="selectedAction === 'upload'"></upload-files>
-        </transition>
-        <transition name="component-fade" mode="in-out">
-            <Explorer v-if="selectedAction === 'explorer'" v-on:loadFiles="loadVideoPage"></Explorer>
-        </transition>
-        <transition name="component-fade" mode="in-out">
-            <VideoPage v-if="selectedAction === 'videoPage'" :selectedFolder="selectedFolder"></VideoPage>
-        </transition>
+        <div>
+            <transition name="component-fade" mode="in-out">
+                <upload-files v-if="selectedAction === 'upload'"></upload-files>
+            </transition>
+            <transition name="component-fade" mode="in-out">
+                <Explorer v-if="selectedAction === 'explorer'" v-on:loadFiles="loadVideoPage"></Explorer>
+            </transition>
+            <transition name="component-fade" mode="in-out">
+                <VideoPage v-if="selectedAction === 'videoPage'" :selectedFolder="selectedFolder"></VideoPage>
+            </transition>
+        </div>
     </div>
 </template>
 
@@ -48,6 +54,10 @@
     }
 </script>
 <style scoped>
+    .filesActions{
+        margin-bottom: 10px;
+    }
+
   /*.component-fade-enter-active, .component-fade-leave-active {*/
   /*  transition: opacity .3s ease;*/
   /*}*/

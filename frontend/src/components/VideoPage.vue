@@ -7,12 +7,13 @@
                                   max="100"></b-form-input>
                 </b-col>
                 <b-col>
-                    <b-btn v-if="!isSelectedView" variant="info" @click="viewSelection(true)">View Selection <b-icon-eye-fill></b-icon-eye-fill></b-btn>
+                    <b-btn :disabled="isHideView" v-if="!isSelectedView" variant="info" @click="viewSelection(true)">View Selection <b-icon-eye-fill></b-icon-eye-fill></b-btn>
                     <b-btn v-if="isSelectedView" variant="info" @click="viewSelection(false)">Un-view Selection <b-icon-eye-slash-fill></b-icon-eye-slash-fill></b-btn>
                     |
-                    <b-btn variant="warning">Hide Selection <b-icon-eye-slash-fill></b-icon-eye-slash-fill></b-btn>
+                    <b-btn :disabled="isSelectedView" v-if="!isHideView" variant="warning" @click="hideSelection(true)" >Hide Selection <b-icon-eye-slash-fill></b-icon-eye-slash-fill></b-btn>
+                    <b-btn v-if="isHideView" variant="warning" @click="hideSelection(false)" >Un-hide Selection <b-icon-eye--fill></b-icon-eye--fill></b-btn>
                     |
-                    <b-btn variant="danger">Delete Selected <b-icon-x-circle-fill></b-icon-x-circle-fill></b-btn>
+                    <b-btn :disabled="isSelectedView || isHideView" variant="danger">Delete Selected <b-icon-x-circle-fill></b-icon-x-circle-fill></b-btn>
                 </b-col>
             </b-row>
         </b-container>
@@ -36,7 +37,7 @@
                         json
                         <b-icon-download></b-icon-download>
                     </b-btn>
-                        <b-form-checkbox v-show="!isSelectedView" :id="item.name" v-model="item.selected"></b-form-checkbox>
+                        <b-form-checkbox v-show="!isSelectedView && !isHideView" :id="item.name" v-model="item.selected"></b-form-checkbox>
                 </b-card>
         </b-row>
     </div>
@@ -57,7 +58,8 @@
                 players: [],
                 videoSize: 50,
                 selectedVideos: [],
-                isSelectedView: false
+                isSelectedView: false,
+                isHideView: false
             }
         },
         methods: {
@@ -84,7 +86,19 @@
                 }
                 else this.selectedVideos = this.files;
                 this.displayedVideos = this.selectedVideos;
-                console.log(this.displayedVideos);
+            },
+            hideSelection(bool) {
+                this.isHideView = bool;
+                this.selectedVideos = [];
+                if (bool){
+                    for (let i = 0 ; i < this.files.length ; i++) {
+                        if (!this.files[i].selected) {
+                            this.selectedVideos.push(this.files[i])
+                        }
+                    }
+                }
+                else this.selectedVideos = this.files;
+                this.displayedVideos = this.selectedVideos;
             }
         },
         mounted() {

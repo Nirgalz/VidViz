@@ -3,14 +3,17 @@
         <b-table hover :items="folders" :fields="fields">
             <template v-slot:cell(actions)="data">
                 <b-btn variant="success" @click="loadFilesToPage(data.item.name)">
+                    View
                     <b-icon-eye-fill></b-icon-eye-fill>
                 </b-btn>
                 |
                 <b-btn variant="info" v-b-modal.modal-editFolder @click="selectFolderToEdit(data.item.name)">
+                    Edit
                     <b-icon-pencil></b-icon-pencil>
                 </b-btn>
                 |
                 <b-btn variant="danger" @click="deleteItem(data.item.name)">
+                    Delete
                     <b-icon-x-circle-fill></b-icon-x-circle-fill>
                 </b-btn>
             </template>

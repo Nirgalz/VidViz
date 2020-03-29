@@ -3,9 +3,10 @@
         <b-container>
             <b-row class="selectActions">
                 <b-col>
-                    <!--                    <b-form-input @change="changeVideoSize" v-model="videoSize" type="range" min="0"-->
-                    <!--                                  max="100"></b-form-input>-->
-                    <b-btn @click="changeVideoSize">window size</b-btn>
+                    <b-btn v-if="!play" @click="playPauseVideos(true)">Play  <b-icon-play-fill></b-icon-play-fill></b-btn>
+                    <b-btn v-if="play" @click="playPauseVideos(false)">Pause <b-icon-pause-fill></b-icon-pause-fill></b-btn>
+                    <b-btn @click="showStuff">test</b-btn>
+                    <b-form-input type="range" min="0" max="100"></b-form-input>
                 </b-col>
                 <b-col>
                     <b-btn :disabled="isHideView" v-if="!isSelectedView" variant="info" @click="viewSelection(true)">
@@ -32,7 +33,7 @@
         </b-container>
         <b-row class="videoContainer">
             <b-card v-for="(item, index) in displayedVideos" :key="index" class="videoBox" :id="'tile-'+index">
-                <div @click="playPauseVideos">
+                <div>
                     <video-player
                             class="video-player-box"
                             ref="videoPlayer"
@@ -80,13 +81,25 @@
                 videoHeight: 150,
                 selectedVideos: [],
                 isSelectedView: false,
-                isHideView: false
+                isHideView: false,
+                play: false
             }
         },
         methods: {
-            playPauseVideos() {
+            showStuff() {
+                console.log(this.players[0].player.duration());
+            },
+            playPauseVideos(play) {
+                this.play = play;
+                console.log(this.play);
+                if (play) {
                 for (let i = 0; i < this.players.length; i++) {
-                    this.players[i].player.play();
+                        this.players[i].player.play();
+                    }
+                }else {
+                    for (let i = 0; i < this.players.length; i++) {
+                        this.players[i].player.pause();
+                    }
                 }
             },
             changeVideoSize() {
@@ -146,6 +159,7 @@
             viewSelection(bool) {
                 this.isSelectedView = bool;
                 this.selectedVideos = [];
+
                 if (bool) {
                     for (let i = 0; i < this.files.length; i++) {
                         if (this.files[i].selected) {
@@ -153,12 +167,16 @@
                         }
                     }
                 } else this.selectedVideos = this.files;
-                this.displayedVideos = this.selectedVideos;
-                this.changeVideoSize();
+
+                if (this.selectedVideos.length>0) {
+                    this.displayedVideos = this.selectedVideos;
+                    this.changeVideoSize();
+                }
             },
             hideSelection(bool) {
                 this.isHideView = bool;
                 this.selectedVideos = [];
+
                 if (bool) {
                     for (let i = 0; i < this.files.length; i++) {
                         if (!this.files[i].selected) {
@@ -166,12 +184,11 @@
                         }
                     }
                 } else this.selectedVideos = this.files;
-                this.displayedVideos = this.selectedVideos;
-                this.refreshPlayersList();
-                this.changeVideoSize();
-            },
-            refreshPlayersList() {
-                this.players = this.$refs.videoPlayer;
+
+                if (this.selectedVideos.length>0) {
+                    this.displayedVideos = this.selectedVideos;
+                    this.changeVideoSize();
+                }
             }
         },
         mounted() {

@@ -3,10 +3,16 @@
         <b-container>
             <b-row class="selectActions">
                 <b-col>
-                    <b-btn v-if="!play" @click="playPauseVideos(true)">Play  <b-icon-play-fill></b-icon-play-fill></b-btn>
-                    <b-btn v-if="play" @click="playPauseVideos(false)">Pause <b-icon-pause-fill></b-icon-pause-fill></b-btn>
+                    <div id="videoControls"></div>
+                    <b-btn v-if="!play" @click="playPauseVideos(true)">Play
+                        <b-icon-play-fill></b-icon-play-fill>
+                    </b-btn>
+                    <b-btn v-if="play" @click="playPauseVideos(false)">Pause
+                        <b-icon-pause-fill></b-icon-pause-fill>
+                    </b-btn>
                     <b-btn @click="showStuff">test</b-btn>
-                    <b-form-input type="range" min="0" max="100"></b-form-input>
+                    <b-form-input type="range" step="0.0001" :value="videoCurrentTime" min="0"
+                                  :max="videoDuration"></b-form-input>
                 </b-col>
                 <b-col>
                     <b-btn :disabled="isHideView" v-if="!isSelectedView" variant="info" @click="viewSelection(true)">
@@ -34,17 +40,19 @@
         <b-row class="videoContainer">
             <b-card v-for="(item, index) in displayedVideos" :key="index" class="videoBox" :id="'tile-'+index">
                 <div>
-                    <video-player
-                            class="video-player-box"
-                            ref="videoPlayer"
-                            :options="{
-                        sources:[{src:item.url}],
-                        controls:false,
-                        width: videoWitdh,
-                        height:videoHeight
-                    }"
-                    >
-                    </video-player>
+                    <video ref="videoPlayer" :src="item.url" :width="videoWidth" :height="videoHeight"></video>
+                    <!--                    <video-player-->
+                    <!--                            class="video-player-box"-->
+                    <!--                            ref="videoPlayer"-->
+                    <!--                            :options="{-->
+                    <!--                        muted: true,-->
+                    <!--                        sources:[{src:item.url}],-->
+                    <!--                        controls:false,-->
+                    <!--                        width: videoWidth,-->
+                    <!--                        height:videoHeight-->
+                    <!--                    }"-->
+                    <!--                    >-->
+                    <!--                    </video-player>-->
                 </div>
 
                 <div class="videoActions">
@@ -77,29 +85,37 @@
                 displayedVideos: [],
                 players: [],
                 videoSize: 50,
-                videoWitdh: 150,
+                videoWidth: 150,
                 videoHeight: 150,
                 selectedVideos: [],
                 isSelectedView: false,
                 isHideView: false,
-                play: false
+                play: false,
+                videoCurrentTime: 0,
+                videoDuration: 0
             }
         },
         methods: {
             showStuff() {
-                console.log(this.players[0].player.duration());
+                console.log(this.players[0].duration);
             },
             playPauseVideos(play) {
+                this.videoDuration = this.players[0].duration;
+
                 this.play = play;
-                console.log(this.play);
                 if (play) {
-                for (let i = 0; i < this.players.length; i++) {
-                        this.players[i].player.play();
-                    }
-                }else {
                     for (let i = 0; i < this.players.length; i++) {
-                        this.players[i].player.pause();
+                        this.players[i].play();
                     }
+                } else {
+                    for (let i = 0; i < this.players.length; i++) {
+                        this.players[i].pause();
+                    }
+                }
+            },
+            updateVideoControls() {
+                if (this.players.length > 0) {
+                    this.videoCurrentTime = this.players[0].currentTime
                 }
             },
             changeVideoSize() {
@@ -146,13 +162,13 @@
                 console.log(ncols);
                 let size = cell_size - 70;
                 if (size < 150) {
-                    size =150;
+                    size = 150;
                 }
 
                 for (let i = 0; i < this.players.length; i++) {
                     // this.players[i].player.width(size);
                     // this.players[i].player.height(size);
-                    this.videoWitdh = size;
+                    this.videoWidth = size;
                     this.videoHeight = size;
                 }
             },
@@ -168,7 +184,7 @@
                     }
                 } else this.selectedVideos = this.files;
 
-                if (this.selectedVideos.length>0) {
+                if (this.selectedVideos.length > 0) {
                     this.displayedVideos = this.selectedVideos;
                     this.changeVideoSize();
                 }
@@ -185,7 +201,7 @@
                     }
                 } else this.selectedVideos = this.files;
 
-                if (this.selectedVideos.length>0) {
+                if (this.selectedVideos.length > 0) {
                     this.displayedVideos = this.selectedVideos;
                     this.changeVideoSize();
                 }
@@ -201,7 +217,14 @@
                 this.displayedVideos = this.files;
             }).then(() => {
                 this.players = this.$refs.videoPlayer;
+                //this.videoCurrentTime = this.players[0].currentTime;
             });
+
+
+            window.setInterval(() => {
+                this.updateVideoControls()
+            }, 100)
+
         }
     }
 </script>

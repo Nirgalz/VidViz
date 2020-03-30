@@ -10,9 +10,14 @@
                     <b-btn v-if="play" @click="playPauseVideos(false)">Pause
                         <b-icon-pause-fill></b-icon-pause-fill>
                     </b-btn>
-                    <b-btn @click="showStuff">test</b-btn>
-                    <b-form-input type="range" step="0.0001" :value="videoCurrentTime" min="0"
-                                  :max="videoDuration"></b-form-input>
+                    <b-form-input
+                            @click="startVideoFrom()"
+                            v-model="videoCurrentTime"
+                            type="range"
+                            step="0.0001"
+                            min="0"
+                            :max="videoDuration">
+                    </b-form-input>
                 </b-col>
                 <b-col>
                     <b-btn :disabled="isHideView" v-if="!isSelectedView" variant="info" @click="viewSelection(true)">
@@ -40,19 +45,12 @@
         <b-row class="videoContainer">
             <b-card v-for="(item, index) in displayedVideos" :key="index" class="videoBox" :id="'tile-'+index">
                 <div>
-                    <video ref="videoPlayer" :src="item.url" :width="videoWidth" :height="videoHeight"></video>
-                    <!--                    <video-player-->
-                    <!--                            class="video-player-box"-->
-                    <!--                            ref="videoPlayer"-->
-                    <!--                            :options="{-->
-                    <!--                        muted: true,-->
-                    <!--                        sources:[{src:item.url}],-->
-                    <!--                        controls:false,-->
-                    <!--                        width: videoWidth,-->
-                    <!--                        height:videoHeight-->
-                    <!--                    }"-->
-                    <!--                    >-->
-                    <!--                    </video-player>-->
+                    <video ref="videoPlayer"
+                           :src="item.url"
+                           :width="videoWidth"
+                           :height="videoHeight">
+
+                    </video>
                 </div>
 
                 <div class="videoActions">
@@ -92,16 +90,15 @@
                 isHideView: false,
                 play: false,
                 videoCurrentTime: 0,
-                videoDuration: 0
+                videoDuration: 0,
+                refreshVideoFunc : null,
+                startTime: 0,
             }
         },
         methods: {
-            showStuff() {
-                console.log(this.players[0].duration);
-            },
             playPauseVideos(play) {
                 this.videoDuration = this.players[0].duration;
-
+                this.refreshVideoProgress(play);
                 this.play = play;
                 if (play) {
                     for (let i = 0; i < this.players.length; i++) {
@@ -112,10 +109,21 @@
                         this.players[i].pause();
                     }
                 }
+
+            },
+            startVideoFrom() {
+                this.playPauseVideos(false);
+                for (let i = 0 ; i < this.players.length ; i++) {
+                    this.players[i].currentTime = this.videoCurrentTime;
+                }
+                this.playPauseVideos(true);
             },
             updateVideoControls() {
                 if (this.players.length > 0) {
-                    this.videoCurrentTime = this.players[0].currentTime
+                    this.videoCurrentTime = this.players[0].currentTime;
+                    if (this.players[0].ended) {
+                        this.play = false;
+                    }
                 }
             },
             changeVideoSize() {
@@ -205,6 +213,17 @@
                     this.displayedVideos = this.selectedVideos;
                     this.changeVideoSize();
                 }
+            },
+            refreshVideoProgress(bool) {
+                if (bool) {
+                    this.refreshVideoFunc = window.setInterval(() => {
+                        this.updateVideoControls()
+                    }, 100)
+                } else {
+                    window.clearInterval(this.refreshVideoFunc);
+                    this.refreshVideoFunc = null;
+                }
+
             }
         },
         mounted() {
@@ -217,14 +236,10 @@
                 this.displayedVideos = this.files;
             }).then(() => {
                 this.players = this.$refs.videoPlayer;
-                //this.videoCurrentTime = this.players[0].currentTime;
+                for (let i =0 ; i < this.players.length; i++) {
+                    this.players[i].volume = 0;
+                }
             });
-
-
-            window.setInterval(() => {
-                this.updateVideoControls()
-            }, 100)
-
         }
     }
 </script>

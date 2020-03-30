@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div id="nav">
+    <div id="nav" style="visibility: hidden">
       <router-link to="/">Home</router-link> |
       <router-link to="/files">Files</router-link> |
       <router-link to="/about">About</router-link>
@@ -19,7 +19,7 @@
 }
 
 #nav {
-  padding: 30px;
+  /*padding: 30px;*/
 }
 
 #nav a {

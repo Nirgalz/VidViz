@@ -36,14 +36,15 @@
                         <b-icon-eye-fill></b-icon-eye-fill>
                     </b-btn>
                     |
-                    <b-btn :disabled="isSelectedView || isHideView" variant="danger">Delete Selected
+                    <b-btn :disabled="isSelectedView || isHideView" variant="danger" @click="deleteSelection">Delete
+                        Selected
                         <b-icon-x-circle-fill></b-icon-x-circle-fill>
                     </b-btn>
                 </b-col>
             </b-row>
         </b-container>
         <b-row class="videoContainer">
-            <b-card v-for="(item, index) in displayedVideos" :key="index" class="videoBox" :id="'tile-'+index">
+            <b-card v-for="(item, index) in displayedVideos" :key="index" class="videoBox" :ref="'tile-'+index">
                 <div>
                     <video ref="videoPlayer"
                            :src="item.url"
@@ -91,7 +92,7 @@
                 play: false,
                 videoCurrentTime: 0,
                 videoDuration: 0,
-                refreshVideoFunc : null,
+                refreshVideoFunc: null,
                 startTime: 0,
             }
         },
@@ -113,7 +114,7 @@
             },
             startVideoFrom() {
                 this.playPauseVideos(false);
-                for (let i = 0 ; i < this.players.length ; i++) {
+                for (let i = 0; i < this.players.length; i++) {
                     this.players[i].currentTime = this.videoCurrentTime;
                 }
                 this.playPauseVideos(true);
@@ -214,6 +215,18 @@
                     this.changeVideoSize();
                 }
             },
+            deleteSelection() {
+                this.selectedVideos = [];
+
+                for (let i = 0; i < this.files.length; i++) {
+                    if (this.files[i].selected) {
+                        UploadService.deleteFile(this.files[i].id);
+                        let tile = "tile-"+i;
+                        this.$refs[tile][0].style.display = "none";
+                    }
+                }
+                this.loadFiles();
+            },
             refreshVideoProgress(bool) {
                 if (bool) {
                     this.refreshVideoFunc = window.setInterval(() => {
@@ -224,22 +237,24 @@
                     this.refreshVideoFunc = null;
                 }
 
+            },
+            loadFiles(){
+                UploadService.getFiles(this.selectedFolder).then(response => {
+                    this.files = response.data;
+                    for (let i = 0; i < this.files.length; i++) {
+                        this.files[i].selected = false;
+                    }
+                    this.displayedVideos = this.files;
+                }).then(() => {
+                    this.players = this.$refs.videoPlayer;
+                    for (let i = 0; i < this.players.length; i++) {
+                        this.players[i].volume = 0;
+                    }
+                });
             }
         },
         mounted() {
-            UploadService.getFiles(this.selectedFolder).then(response => {
-                this.files = response.data;
-                for (let i = 0; i < this.files.length; i++) {
-                    this.files[i].selected = false;
-                    this.files[i].id = i;
-                }
-                this.displayedVideos = this.files;
-            }).then(() => {
-                this.players = this.$refs.videoPlayer;
-                for (let i =0 ; i < this.players.length; i++) {
-                    this.players[i].volume = 0;
-                }
-            });
+            this.loadFiles();
         }
     }
 </script>

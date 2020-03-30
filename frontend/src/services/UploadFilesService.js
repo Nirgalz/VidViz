@@ -47,5 +47,11 @@ class UploadFilesService {
     getFile(folderName, fileName) {
         return http.get("files/"+folderName+"/"+fileName);
     }
+
+    deleteFile(id) {
+        let formData = new FormData();
+        formData.append("id", id);
+        return http.post("action/files/delete", formData)
+    }
 }
 export default new UploadFilesService();

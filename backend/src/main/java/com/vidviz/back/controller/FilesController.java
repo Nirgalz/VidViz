@@ -5,9 +5,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import com.vidviz.back.model.*;
-import com.vidviz.back.service.FileService;
+import com.vidviz.back.service.VideoService;
 import com.vidviz.back.service.FileStorageService;
 import com.vidviz.back.service.FolderService;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
@@ -16,12 +17,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
@@ -38,26 +37,10 @@ public class FilesController {
     FolderService folderService;
 
     @Autowired
-    FileService fileService;
+    VideoService videoService;
 
     @Autowired
     ServletContext servletContext;
-
-    @PostMapping("api/uploadfile")
-    public ResponseEntity<ResponseMessage> uploadFileByFile(
-            final HttpServletRequest request,
-            final HttpServletResponse response) {
-        request.getHeader("content-range");
-        request.getHeader("content-length");
-        request.getHeader("content-disposition");
-        try {
-            request.getInputStream(); //actual content.
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("okokokokokok"));
-    }
 
     @PostMapping("api/upload")
     public ResponseEntity<ResponseMessage> uploadFile(@RequestParam("file") MultipartFile[] files, @RequestParam("pageName") String folderName) {
@@ -74,12 +57,11 @@ public class FilesController {
                 Video savedVideo = new Video();
                 if (Objects.requireNonNull(file.getOriginalFilename()).endsWith(".json")) {
                     jsonFiles.add(file);
-                }
-                else {
+                } else {
                     savedVideo.setName(file.getOriginalFilename());
                     savedVideo.setFolder(folder);
 
-                    folder.addFile(fileService.saveVideo(savedVideo));
+                    folder.addFile(videoService.saveVideo(savedVideo));
                 }
                 LOG.info("upload from client");
                 message = "Uploaded the file successfully: " + file.getOriginalFilename();
@@ -93,11 +75,11 @@ public class FilesController {
             }
         }
         for (MultipartFile jsonFile : jsonFiles) {
-            Video video =  fileService.findByNameAndFolderName(jsonFile.getOriginalFilename()
-                    .replace("jsonoutput","ffmpegencodevideo")
-                    .replace(".json",".mp4"), folderName);
+            Video video = videoService.findByNameAndFolderName(jsonFile.getOriginalFilename()
+                    .replace("jsonoutput", "ffmpegencodevideo")
+                    .replace(".json", ".mp4"), folderName);
             video.setJson(jsonFile.getOriginalFilename());
-            fileService.saveVideo(video);
+            videoService.saveVideo(video);
 
         }
 
@@ -121,9 +103,9 @@ public class FilesController {
         List<VideoFront> filesFront = new ArrayList<>();
         List<Video> videos = folderService.getFolderByName(folder).getVideos();
         for (Video video : videos) {
-            filesFront.add(new VideoFront(video.getName(),
-                    "http://localhost:8080/uploads/"+folder+"/"+ video.getName(),
-                    "http://localhost:8080/uploads/"+folder+"/"+ video.getJson()));
+            filesFront.add(new VideoFront(video.getId(), video.getName(),
+                    "http://localhost:8080/uploads/" + folder + "/" + video.getName(),
+                    "http://localhost:8080/uploads/" + folder + "/" + video.getJson()));
         }
         return ResponseEntity.status(HttpStatus.OK).body(filesFront);
     }
@@ -145,6 +127,30 @@ public class FilesController {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(oldName + " has been renamed in " + newName));
     }
 
+    @PostMapping("api/action/files/delete")
+    public ResponseEntity<ResponseMessage> deleteFile(@RequestParam("id") Long id) {
+
+        Optional<Video> video = videoService.findById(id);
+
+        video.ifPresent(video1 -> {
+            try {
+                storageService.deleteFile(video1.getFolder().getName(), video1.getName());
+
+                if (video1.getJson() != null) {
+                    storageService.deleteFile(video1.getFolder().getName(), video1.getJson());
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            videoService.deleteVideo(id);
+
+        });
+
+
+        LOG.info("file deleted");
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(" file has been deleted"));
+    }
+
     @GetMapping("api/action/folders/delete/{folder:.+}")
     @ResponseBody
     public ResponseEntity<String> deleteFolder(@PathVariable String folder) {
@@ -160,7 +166,8 @@ public class FilesController {
 
     @GetMapping("api/files/{foldername:.+}/{filename:.+}")
     @ResponseBody
-    public void getFile(@PathVariable String filename, @PathVariable String foldername, HttpServletResponse response) {
+    public void getFile(@PathVariable String filename, @PathVariable String foldername, HttpServletResponse
+            response) {
         try {
             InputStream inputStream = storageService.load(filename, foldername).getInputStream();
             IOUtils.copy(inputStream, response.getOutputStream());

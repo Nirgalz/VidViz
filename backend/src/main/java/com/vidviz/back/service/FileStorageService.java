@@ -22,4 +22,6 @@ public interface FileStorageService {
     void deleteFolder(String folder) throws IOException;
 
     void editFolderName(String oldName, String newName) throws IOException;
+
+    void deleteFile(String folderName, String fileName) throws IOException;
 }

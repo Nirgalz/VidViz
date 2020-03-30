@@ -23,6 +23,10 @@ public class Video {
     @ManyToOne(fetch = FetchType.LAZY)
     private Folder folder;
 
+    public Long getId() {
+        return id;
+    }
+
     public Folder getFolder() {
         return folder;
     }

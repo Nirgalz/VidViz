@@ -83,4 +83,10 @@ public class FileStorageServiceImpl implements FileStorageService {
             return Stream.<Path>empty();
         }
     }
+
+    @Override
+    public void deleteFile(String folderName, String fileName) throws IOException {
+        Path file = Paths.get("uploads/"+folderName+"/"+fileName);
+        Files.deleteIfExists(file);
+    }
 }

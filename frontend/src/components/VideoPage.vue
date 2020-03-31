@@ -44,7 +44,11 @@
             </b-row>
         </b-container>
         <b-row class="videoContainer">
-            <b-card v-for="(item, index) in displayedVideos" :key="index" class="videoBox" :ref="'tile-'+index">
+            <b-card v-for="(item, index) in displayedVideos"
+                    :key="index" class="videoBox"
+                    :ref="'tile-'+index"
+                    v-bind:style="[item.selected ? {'background-color' : '#28A745'} : {'background-color' : 'white'}]"
+                    @click="selectTile(index)">
                 <div>
                     <video ref="videoPlayer"
                            :src="item.url"
@@ -60,9 +64,9 @@
                         json
                         <b-icon-download></b-icon-download>
                     </b-btn>
-                    |
-                    <b-form-checkbox v-show="!isSelectedView && !isHideView" :id="item.name"
-                                     v-model="item.selected"></b-form-checkbox>
+<!--                    |-->
+<!--                    <b-form-checkbox v-show="!isSelectedView && !isHideView" :id="item.name"-->
+<!--                                     v-model="item.selected"></b-form-checkbox>-->
                 </div>
 
             </b-card>
@@ -180,6 +184,17 @@
                     this.videoWidth = size;
                     this.videoHeight = size;
                 }
+            },
+            selectTile(index) {
+                let tile = "tile-"+index;
+                if (this.files[index].selected) {
+                    this.files[index].selected = false;
+                    this.$refs[tile][0].style.backgroundColor = "white";
+                } else {
+                    this.files[index].selected = true;
+                    this.$refs[tile][0].style.backgroundColor = "#28A745";
+                }
+
             },
             viewSelection(bool) {
                 this.isSelectedView = bool;

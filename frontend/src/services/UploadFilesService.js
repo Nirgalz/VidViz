@@ -57,5 +57,9 @@ class UploadFilesService {
     getNewFolders() {
         return http.get("action/folders/templist");
     }
+
+    processFolders() {
+        return http.get("action/folders/process");
+    }
 }
 export default new UploadFilesService();

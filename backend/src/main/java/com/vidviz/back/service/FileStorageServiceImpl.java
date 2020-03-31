@@ -107,4 +107,16 @@ public class FileStorageServiceImpl implements FileStorageService {
         folderNames.remove(0);
         return folderNames;
     }
+
+    @Override
+    public void moveFolder(String folderName) throws IOException {
+        FileSystemUtils.copyRecursively(Paths.get("temp/"+ folderName), Paths.get("uploads/"+folderName));
+        FileSystemUtils.deleteRecursively(Paths.get("temp/" + folderName));
+    }
+
+    @Override
+    public String[] getFilesInFolder(String folderName) {
+        File folder = new File("temp/"+folderName);
+        return folder.list();
+    }
 }

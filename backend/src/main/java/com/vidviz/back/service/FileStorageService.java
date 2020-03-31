@@ -16,9 +16,9 @@ public interface FileStorageService {
 
     FileSystemResource load(String filename, String folderName);
 
-    public void deleteAll();
+    void deleteAll();
 
-    public Stream<Path> loadAll();
+    Stream<Path> loadAll();
 
     void deleteFolder(String folder) throws IOException;
 
@@ -27,4 +27,8 @@ public interface FileStorageService {
     void deleteFile(String folderName, String fileName) throws IOException;
 
     List<String> getNewFolders() throws IOException;
+
+    void moveFolder(String folderName) throws IOException;
+
+    String[] getFilesInFolder(String folderName);
 }

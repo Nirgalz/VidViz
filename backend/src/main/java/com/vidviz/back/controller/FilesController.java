@@ -2,6 +2,8 @@ package com.vidviz.back.controller;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -188,7 +190,7 @@ public class FilesController {
             if (newFolders.size() == 0) {
                 LOG.info("No new folders");
 
-            }else {
+            } else {
                 return ResponseEntity.status(HttpStatus.OK).body(newFolders);
             }
             return ResponseEntity.status(HttpStatus.OK).body(newFolders);
@@ -196,8 +198,63 @@ public class FilesController {
             LOG.info("problem catching new files");
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(newFolders);
         }
-
     }
+
+    @GetMapping("api/action/folders/process")
+    @ResponseBody
+    public ResponseEntity<ResponseMessage> processFolders() throws IOException {
+        List<String> newFolders = new ArrayList<>();
+        try {
+            newFolders = storageService.getNewFolders();
+            if (newFolders.size() == 0) {
+                LOG.info("No new folders");
+                return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("no new folders"));
+            }
+
+        } catch (Exception e) {
+            LOG.info("problem catching new files");
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ResponseMessage("error adding folders"));
+        }
+
+        for (String folderName : newFolders) {
+            if (Files.exists(Paths.get("uploads/" + folderName))) {
+                LOG.info("folder " + folderName + " already exists");
+                return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(folderName + " folder already exists"));
+            }
+
+            Folder folder = new Folder();
+            folder.setName(folderName);
+            folderService.saveFolder(folder);
+
+            List<String> jsonFiles = new ArrayList<>();
+            List<String> videoNames = new ArrayList<>();
+            String[] files = storageService.getFilesInFolder(folderName);
+            storageService.moveFolder(folderName);
+
+            for (String fileName : files) {
+                if (fileName.endsWith(".json")) {
+                    jsonFiles.add(fileName);
+                } else {
+                    Video video = new Video();
+                    video.setName(fileName);
+                    video.setFolder(folder);
+
+                    folder.addFile(videoService.saveVideo(video));
+                }
+            }
+
+            for (String fileName : jsonFiles) {
+                Video video = videoService.findByNameAndFolderName(fileName
+                        .replace("jsonoutput", "ffmpegencodevideo")
+                        .replace(".json", ".mp4"), folderName);
+                video.setJson(fileName);
+                videoService.saveVideo(video);
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("folders successfuly added"));
+    }
+
 
     @GetMapping("api/files/deleteall")
     @ResponseBody

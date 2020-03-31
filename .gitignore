@@ -42,5 +42,7 @@ frontend/yarn.lock
 security/target/
 selenium-debug.log
 uploads/
+temp/
+ffmpeg/
 
 !.mvn/wrapper/maven-wrapper.jar

@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import com.vidviz.back.model.*;
+import com.vidviz.back.service.VideoEncodingService;
 import com.vidviz.back.service.VideoService;
 import com.vidviz.back.service.FileStorageService;
 import com.vidviz.back.service.FolderService;
@@ -43,6 +44,8 @@ public class FilesController {
 
     @Autowired
     ServletContext servletContext;
+
+    VideoEncodingService videoEncodingService = new VideoEncodingService();
 
     @PostMapping("api/upload")
     public ResponseEntity<ResponseMessage> uploadFile(@RequestParam("file") MultipartFile[] files, @RequestParam("pageName") String folderName) {
@@ -104,12 +107,29 @@ public class FilesController {
     public ResponseEntity<List<VideoFront>> getFilesByFolder(@PathVariable String folder) {
         List<VideoFront> filesFront = new ArrayList<>();
         List<Video> videos = folderService.getFolderByName(folder).getVideos();
+        if (Files.exists(Paths.get("uploads/"+folder+"/thumbnails"))) {
+            folder += "/thumbnails";
+        }
         for (Video video : videos) {
             filesFront.add(new VideoFront(video.getId(), video.getName(),
                     "http://localhost:8080/uploads/" + folder + "/" + video.getName(),
                     "http://localhost:8080/uploads/" + folder + "/" + video.getJson()));
         }
         return ResponseEntity.status(HttpStatus.OK).body(filesFront);
+    }
+
+    @GetMapping("api/action/folder/encode/{folder:.+}")
+    @ResponseBody
+    public ResponseEntity<ResponseMessage> encodeFolder(@PathVariable String folder) {
+        List<Video> videos = folderService.getFolderByName(folder).getVideos();
+        for (Video video : videos) {
+            try {
+                videoEncodingService.encodeVideo(Paths.get(folder), video.getName());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("folder encoded"));
     }
 
     @PostMapping("api/action/folders/rename/")

@@ -61,5 +61,8 @@ class UploadFilesService {
     processFolders() {
         return http.get("action/folders/process");
     }
+    encodeFolder(name) {
+        return http.get("action/folder/encode/"+name);
+    }
 }
 export default new UploadFilesService();

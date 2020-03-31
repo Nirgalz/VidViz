@@ -2,6 +2,7 @@
     <div>
         <b-table hover :items="folders" :fields="fields">
             <template v-slot:cell(actions)="data">
+
                 <b-btn variant="success" @click="loadFilesToPage(data.item.name)">
                     View
                     <b-icon-eye-fill></b-icon-eye-fill>
@@ -16,6 +17,8 @@
                     Delete
                     <b-icon-x-circle-fill></b-icon-x-circle-fill>
                 </b-btn>
+                |
+                <b-btn variant="warning" @click="encodeFolder(data.item.name)">encode</b-btn>
             </template>
         </b-table>
         <b-modal id="modal-editFolder" title="Edit" @ok="editItem">
@@ -58,6 +61,9 @@
                 UploadService.getFolders().then(response => {
                     this.folders = response.data;
                 });
+            },
+            encodeFolder(folderName) {
+                UploadService.encodeFolder(folderName);
             }
         },
         mounted() {

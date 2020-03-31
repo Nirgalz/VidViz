@@ -62,6 +62,11 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<dependency>
+			<groupId>com.github.kokorin.jaffree</groupId>
+			<artifactId>jaffree</artifactId>
+			<version>0.9.3</version>
+		</dependency>
 	</dependencies>
 
 	<build>

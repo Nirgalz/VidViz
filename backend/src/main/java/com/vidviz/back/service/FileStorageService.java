@@ -2,6 +2,7 @@ package com.vidviz.back.service;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.springframework.core.io.FileSystemResource;
@@ -24,4 +25,6 @@ public interface FileStorageService {
     void editFolderName(String oldName, String newName) throws IOException;
 
     void deleteFile(String folderName, String fileName) throws IOException;
+
+    List<String> getNewFolders() throws IOException;
 }

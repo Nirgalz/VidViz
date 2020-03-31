@@ -1,6 +1,11 @@
 <template>
     <div>
         <div class="filesActions">
+            <b-btn variant="warning" @click="selectedAction = 'import'">
+                Import folders
+                <b-icon-folder-symlink></b-icon-folder-symlink>
+            </b-btn>
+            |
             <b-btn variant="success" @click="selectedAction = 'upload'">
                 Upload
                 <b-icon-upload></b-icon-upload>
@@ -13,6 +18,9 @@
         </div>
 
         <div>
+            <transition name="component-fade" mode="in-out">
+                <import v-if="selectedAction === 'import'"></import>
+            </transition>
             <transition name="component-fade" mode="in-out">
                 <upload-files v-if="selectedAction === 'upload'"></upload-files>
             </transition>
@@ -30,6 +38,7 @@
     import UploadFiles from "../components/UploadFiles";
     import Explorer from "../components/Explorer";
     import VideoPage from "../components/VideoPage";
+    import Import from "../components/Import";
 
     export default {
         name: 'Files',
@@ -41,6 +50,7 @@
             }
         },
         components: {
+            Import,
             UploadFiles,
             Explorer,
             VideoPage

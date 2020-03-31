@@ -1,15 +1,15 @@
 package com.vidviz.back.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.vidviz.back.BackApplication;
-import io.micrometer.core.instrument.util.JsonUtils;
-import org.springframework.boot.system.ApplicationHome;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
@@ -19,12 +19,16 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileStorageServiceImpl implements FileStorageService {
 
     private final Path root = Paths.get("uploads");
+    private final Path temp = Paths.get("temp");
 
     @Override
     public void init() {
         try {
             if (Files.notExists(root)) {
                 Files.createDirectory(root);
+            }
+            if (Files.notExists(temp)) {
+                Files.createDirectory(temp);
             }
         } catch (IOException e) {
             throw new RuntimeException("Could not initialize folder for upload!");
@@ -88,5 +92,19 @@ public class FileStorageServiceImpl implements FileStorageService {
     public void deleteFile(String folderName, String fileName) throws IOException {
         Path file = Paths.get("uploads/"+folderName+"/"+fileName);
         Files.deleteIfExists(file);
+    }
+
+    @Override
+    public List<String> getNewFolders() throws IOException {
+        Path path = Paths.get("temp");
+        List<Path> subfolder = Files.walk(path, 1)
+                .filter(Files::isDirectory)
+                .collect(Collectors.toList());
+        List<String> folderNames = new ArrayList<>();
+        for (Path folder : subfolder){
+            folderNames.add(folder.getFileName().toString());
+        }
+        folderNames.remove(0);
+        return folderNames;
     }
 }

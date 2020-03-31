@@ -53,5 +53,9 @@ class UploadFilesService {
         formData.append("id", id);
         return http.post("action/files/delete", formData)
     }
+
+    getNewFolders() {
+        return http.get("action/folders/templist");
+    }
 }
 export default new UploadFilesService();

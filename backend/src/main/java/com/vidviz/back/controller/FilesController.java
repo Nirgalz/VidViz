@@ -179,6 +179,26 @@ public class FilesController {
 
     }
 
+    @GetMapping("api/action/folders/templist")
+    @ResponseBody
+    public ResponseEntity<List<String>> getNewFolders() {
+        List<String> newFolders = new ArrayList<>();
+        try {
+            newFolders = storageService.getNewFolders();
+            if (newFolders.size() == 0) {
+                LOG.info("No new folders");
+
+            }else {
+                return ResponseEntity.status(HttpStatus.OK).body(newFolders);
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(newFolders);
+        } catch (Exception e) {
+            LOG.info("problem catching new files");
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(newFolders);
+        }
+
+    }
+
     @GetMapping("api/files/deleteall")
     @ResponseBody
     public ResponseEntity<ResponseMessage> deleteAll() {

@@ -55,7 +55,7 @@ class UploadFilesService {
     }
 
     getNewFolders() {
-        return http.get("action/folders/templist");
+        return http.get("action/scan");
     }
 
     processFolders() {

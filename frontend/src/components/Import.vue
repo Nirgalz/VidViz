@@ -13,6 +13,8 @@
                 {{folder}}
             </li>
         </ul>
+
+        <b-btn @click="getFolders">Refresh <b-icon-bootstrap-reboot></b-icon-bootstrap-reboot></b-btn>
     </div>
 </template>
 

@@ -17,13 +17,4 @@ public class MainController {
         //LOG.info("URL entered directly into the Browser, so we need to redirect...");
         return "forward:/";
     }
-
-    //@CrossOrigin(origins = "http://localhost:8080")
-    @RequestMapping(path = "api/hello")
-    public @ResponseBody
-    String sayHello() {
-        System.out.println("caca");
-        LOG.info("GET called on /hello resource");
-        return "qqqqqqq";
-    }
 }

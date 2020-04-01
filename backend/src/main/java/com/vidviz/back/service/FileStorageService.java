@@ -27,11 +27,9 @@ public interface FileStorageService {
 
     void deleteFile(String folderName, String fileName) throws IOException;
 
-    List<String> getNewFolders() throws IOException;
-
-    void moveFolder(String folderName) throws IOException;
-
     String[] getFilesInFolder(String folderName);
 
     String getVideosfolder();
+
+    boolean isFolderExists(String name);
 }

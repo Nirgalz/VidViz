@@ -2,7 +2,7 @@
     <div>
         <div class="filesActions">
             <b-btn variant="warning" @click="selectedAction = 'import'">
-                Import folders
+                Scan folder
                 <b-icon-folder-symlink></b-icon-folder-symlink>
             </b-btn>
             |

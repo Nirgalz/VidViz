@@ -37,8 +37,14 @@ public class FileStorageServiceImpl implements FileStorageService {
         }
     }
 
+    @Override
     public String getVideosfolder(){
         return VIDEOSFOLDER;
+    }
+
+    @Override
+    public boolean isFolderExists(String name) {
+        return Files.exists(Paths.get(VIDEOSFOLDER+name));
     }
 
     @Override
@@ -53,6 +59,8 @@ public class FileStorageServiceImpl implements FileStorageService {
             throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
         }
     }
+
+
 
     @Override
     public FileSystemResource load(String filename, String folderName) {
@@ -101,28 +109,8 @@ public class FileStorageServiceImpl implements FileStorageService {
     }
 
     @Override
-    public List<String> getNewFolders() throws IOException {
-        Path path = Paths.get("temp");
-        List<Path> subfolder = Files.walk(path, 1)
-                .filter(Files::isDirectory)
-                .collect(Collectors.toList());
-        List<String> folderNames = new ArrayList<>();
-        for (Path folder : subfolder){
-            folderNames.add(folder.getFileName().toString());
-        }
-        folderNames.remove(0);
-        return folderNames;
-    }
-
-    @Override
-    public void moveFolder(String folderName) throws IOException {
-        FileSystemUtils.copyRecursively(Paths.get("temp/"+ folderName), Paths.get("uploads/"+folderName));
-        FileSystemUtils.deleteRecursively(Paths.get("temp/" + folderName));
-    }
-
-    @Override
     public String[] getFilesInFolder(String folderName) {
-        File folder = new File("temp/"+folderName);
+        File folder = new File(VIDEOSFOLDER+folderName);
         return folder.list();
     }
 }

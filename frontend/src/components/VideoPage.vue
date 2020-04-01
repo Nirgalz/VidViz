@@ -4,10 +4,14 @@
             <b-row class="selectActions">
                 <b-col>
                     <div id="videoControls"></div>
-                    <b-btn v-if="!play" @click="playPauseVideos(true)">Play
+                    <b-btn v-if="!play"
+                           @click="playPauseVideos(true)"
+                           v-b-tooltip.hover title="Play [SPACEBAR]">
                         <b-icon-play-fill></b-icon-play-fill>
                     </b-btn>
-                    <b-btn v-if="play" @click="playPauseVideos(false)">Pause
+                    <b-btn v-if="play"
+                           @click="playPauseVideos(false)"
+                           v-b-tooltip.hover title="Pause [SPACEBAR]">
                         <b-icon-pause-fill></b-icon-pause-fill>
                     </b-btn>
                     <b-form-input
@@ -20,41 +24,53 @@
                     </b-form-input>
                 </b-col>
                 <b-col>
-                    <b-btn :disabled="isHideView" v-if="!isSelectedView" @click="viewSelection(true)">
-                        View Selection
+                    <b-btn @click="unSelect"
+                           :disabled="isSelectedView || isHideView"
+                           v-b-tooltip.hover title="Unselect all elements [C]">
+                        <b-icon-unlock-fill></b-icon-unlock-fill>
+                    </b-btn>
+                    <b-btn :disabled="isHideView"
+                           v-if="!isSelectedView"
+                           @click="viewSelection(true)"
+                           v-b-tooltip.hover title="View Selection [V]">
                         <b-icon-eye-fill></b-icon-eye-fill>
                     </b-btn>
-                    <b-btn v-if="isSelectedView" @click="viewSelection(false)">Un-view Selection
+                    <b-btn v-if="isSelectedView"
+                           @click="viewSelection(false)"
+                           v-b-tooltip.hover title="Un-view Selection [V]">
                         <b-icon-eye-slash-fill></b-icon-eye-slash-fill>
                     </b-btn>
-                    |
-                    <b-btn :disabled="isSelectedView" v-if="!isHideView" @click="hideSelection(true)">
-                        Hide Selection
+                    <b-btn :disabled="isSelectedView"
+                           v-if="!isHideView"
+                           @click="hideSelection(true)"
+                           v-b-tooltip.hover title="Hide Selection [B]">
                         <b-icon-eye-slash-fill></b-icon-eye-slash-fill>
                     </b-btn>
-                    <b-btn v-if="isHideView" @click="hideSelection(false)">Un-hide Selection
+                    <b-btn v-if="isHideView"
+                           @click="hideSelection(false)"
+                           v-b-tooltip.hover title="Un-hide Selection [B]">
                         <b-icon-eye-fill></b-icon-eye-fill>
                     </b-btn>
-                    |
-                    <b-btn :disabled="isSelectedView || isHideView" @click="downloadJson">
-                        Download json
-                        <b-icon-x-circle-fill></b-icon-x-circle-fill>
+                    <b-btn :disabled="isSelectedView || isHideView"
+                           @click="downloadJson"
+                           v-b-tooltip.hover title="Download json [J]">
+                        <b-icon-download></b-icon-download>
                     </b-btn>
-                    |
-                    <b-btn :disabled="isSelectedView || isHideView" @click="deleteSelection">Delete
-                        Selected
-                        <b-icon-x-circle-fill></b-icon-x-circle-fill>
+                    <b-btn :disabled="isSelectedView || isHideView"
+                           @click="deleteSelection"
+                           v-b-tooltip.hover title="Delete Selected [S]">
+                        <b-icon-trash-fill></b-icon-trash-fill>
                     </b-btn>
                 </b-col>
             </b-row>
         </b-container>
         <b-row class="videoContainer">
             <div v-for="(item, index) in displayedVideos"
-                    :key="index"
-                    class="videoBox"
-                    :ref="'tile-'+index"
-                    v-bind:style="[item.selected ? {'background-color' : '#28A745'} : {'background-color' : 'white'}]"
-                    @click="selectTile(index)">
+                 :key="index"
+                 class="videoBox"
+                 :ref="'tile-'+index"
+                 v-bind:style="[item.selected ? {'background-color' : '#28A745'} : {'background-color' : 'white'}]"
+                 @click="selectTile(index)">
                 <div>
 
                     <video ref="videoPlayer"
@@ -96,7 +112,52 @@
                 startTime: 0,
             }
         },
+        created() {
+            window.addEventListener('keypress', this.doCommand);
+        },
+        destroyed() {
+            window.removeEventListener('keypress', this.doCommand);
+        },
         methods: {
+            doCommand(e) {
+                //let cmd = String.fromCharCode(e.keyCode).toLowerCase();
+                e.preventDefault();
+                console.log(e.keyCode);
+                switch (e.keyCode) {
+                    case 32 :
+                        this.playPauseVideos(!this.play);
+                        break;
+                    case 99 :
+                        if (!this.isHideView && !this.isSelectedView) {
+                            this.unSelect();
+                        }
+                        break;
+                    case 118 :
+                        if (!this.isHideView && !this.isSelectedView) {
+                            this.viewSelection(true);
+                        } else {
+                            this.viewSelection(false);
+                        }
+                        break;
+                    case 98 :
+                        if (!this.isHideView && !this.isSelectedView) {
+                            this.hideSelection(true);
+                        } else {
+                            this.hideSelection(false);
+                        }
+                        break;
+                    case 106 :
+                        if (!this.isHideView && !this.isSelectedView) {
+                            this.downloadJson();
+                        }
+                        break;
+                    case 115 :
+                        if (!this.isHideView && !this.isSelectedView) {
+                            this.deleteSelection();
+                        }
+                        break;
+                }
+            },
             playPauseVideos(play) {
                 this.videoDuration = this.players[0].duration;
                 this.refreshVideoProgress(play);
@@ -169,7 +230,7 @@
                 console.log(cell_size);
                 console.log(nrows);
                 console.log(ncols);
-                let size = cell_size - 70;
+                let size = cell_size - 10;
                 if (size < 150) {
                     size = 150;
                 }
@@ -182,7 +243,7 @@
                 }
             },
             selectTile(index) {
-                let tile = "tile-"+index;
+                let tile = "tile-" + index;
                 if (this.files[index].selected) {
                     this.files[index].selected = false;
                     this.$refs[tile][0].style.backgroundColor = "white";
@@ -191,6 +252,14 @@
                     this.$refs[tile][0].style.backgroundColor = "#28A745";
                 }
 
+            },
+            unSelect() {
+                for (let i = 0; i < this.files.length; i++) {
+                    if (this.files[i].selected === true) {
+                        this.files[i].selected = false;
+                        this.$refs["tile-" + i][0].style.backgroundColor = "white";
+                    }
+                }
             },
             viewSelection(bool) {
                 this.isSelectedView = bool;
@@ -232,7 +301,7 @@
                 for (let i = 0; i < this.files.length; i++) {
                     if (this.files[i].selected) {
                         UploadService.deleteFile(this.files[i].id);
-                        let tile = "tile-"+i;
+                        let tile = "tile-" + i;
                         this.$refs[tile][0].style.display = "none";
                     }
                 }
@@ -245,7 +314,7 @@
                         this.selectedVideos.push(this.files[i])
                     }
                 }
-                for (let i = 0 ; i < this.selectedVideos.length ; i++) {
+                for (let i = 0; i < this.selectedVideos.length; i++) {
                     window.open(this.selectedVideos[i].jsonUrl, "_blank");
                 }
             },
@@ -260,7 +329,7 @@
                 }
 
             },
-            loadFiles(){
+            loadFiles() {
                 UploadService.getFiles(this.selectedFolder).then(response => {
                     this.files = response.data;
                     for (let i = 0; i < this.files.length; i++) {

@@ -10,12 +10,21 @@
 </template>
 
 <style>
+  body, html {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    min-height: 100%;
+    background-color: #2d2d2d;
+  }
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: rgb(214, 229, 239);
+  background-color: #2d2d2d;
 }
 
 #nav {

@@ -69,7 +69,7 @@
                  :key="index"
                  class="videoBox"
                  :ref="'tile-'+index"
-                 v-bind:style="[item.selected ? {'background-color' : '#28A745'} : {'background-color' : 'white'}]"
+                 v-bind:style="[item.selected ? {'background-color' : 'rgb(103,117,127)' } : {'background-color' : '#2d2d2d'}]"
                  @click="selectTile(index)">
                 <div>
 
@@ -246,10 +246,10 @@
                 let tile = "tile-" + index;
                 if (this.files[index].selected) {
                     this.files[index].selected = false;
-                    this.$refs[tile][0].style.backgroundColor = "white";
+                    this.$refs[tile][0].style.backgroundColor = '#2d2d2d';
                 } else {
                     this.files[index].selected = true;
-                    this.$refs[tile][0].style.backgroundColor = "#28A745";
+                    this.$refs[tile][0].style.backgroundColor = 'rgb(103,117,127)';
                 }
 
             },
@@ -257,7 +257,7 @@
                 for (let i = 0; i < this.files.length; i++) {
                     if (this.files[i].selected === true) {
                         this.files[i].selected = false;
-                        this.$refs["tile-" + i][0].style.backgroundColor = "white";
+                        this.$refs["tile-" + i][0].style.backgroundColor = '#2d2d2d';
                     }
                 }
             },

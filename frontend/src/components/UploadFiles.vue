@@ -35,10 +35,10 @@
                     <b-form-input v-model="pageName" placeholder="Enter the page name"></b-form-input>
 
 
-                    <b-btn variant="success" :disabled="isUploadBtnAvailable()" @click="upload">
+                    <b-btn :disabled="isUploadBtnAvailable()" @click="upload">
                         Upload
                     </b-btn>
-                    <div class="alert alert-light" role="alert">{{ message }}</div>
+                    <div class="alert" role="alert">{{ message }}</div>
                 </b-col>
             </b-row>
 

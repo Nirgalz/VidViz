@@ -20,23 +20,28 @@
                     </b-form-input>
                 </b-col>
                 <b-col>
-                    <b-btn :disabled="isHideView" v-if="!isSelectedView" variant="info" @click="viewSelection(true)">
+                    <b-btn :disabled="isHideView" v-if="!isSelectedView" @click="viewSelection(true)">
                         View Selection
                         <b-icon-eye-fill></b-icon-eye-fill>
                     </b-btn>
-                    <b-btn v-if="isSelectedView" variant="info" @click="viewSelection(false)">Un-view Selection
+                    <b-btn v-if="isSelectedView" @click="viewSelection(false)">Un-view Selection
                         <b-icon-eye-slash-fill></b-icon-eye-slash-fill>
                     </b-btn>
                     |
-                    <b-btn :disabled="isSelectedView" v-if="!isHideView" variant="warning" @click="hideSelection(true)">
+                    <b-btn :disabled="isSelectedView" v-if="!isHideView" @click="hideSelection(true)">
                         Hide Selection
                         <b-icon-eye-slash-fill></b-icon-eye-slash-fill>
                     </b-btn>
-                    <b-btn v-if="isHideView" variant="warning" @click="hideSelection(false)">Un-hide Selection
+                    <b-btn v-if="isHideView" @click="hideSelection(false)">Un-hide Selection
                         <b-icon-eye-fill></b-icon-eye-fill>
                     </b-btn>
                     |
-                    <b-btn :disabled="isSelectedView || isHideView" variant="danger" @click="deleteSelection">Delete
+                    <b-btn :disabled="isSelectedView || isHideView" @click="downloadJson">
+                        Download json
+                        <b-icon-x-circle-fill></b-icon-x-circle-fill>
+                    </b-btn>
+                    |
+                    <b-btn :disabled="isSelectedView || isHideView" @click="deleteSelection">Delete
                         Selected
                         <b-icon-x-circle-fill></b-icon-x-circle-fill>
                     </b-btn>
@@ -44,32 +49,23 @@
             </b-row>
         </b-container>
         <b-row class="videoContainer">
-            <b-card v-for="(item, index) in displayedVideos"
-                    :key="index" class="videoBox"
+            <div v-for="(item, index) in displayedVideos"
+                    :key="index"
+                    class="videoBox"
                     :ref="'tile-'+index"
                     v-bind:style="[item.selected ? {'background-color' : '#28A745'} : {'background-color' : 'white'}]"
                     @click="selectTile(index)">
                 <div>
+
                     <video ref="videoPlayer"
+                           class="videoPlayers"
                            :src="item.url"
                            :width="videoWidth"
                            :height="videoHeight">
 
                     </video>
                 </div>
-
-                <div class="videoActions">
-                    id : {{item.id}} |
-                    <b-btn variant="success" size="sm" :href="item.jsonUrl">
-                        json
-                        <b-icon-download></b-icon-download>
-                    </b-btn>
-<!--                    |-->
-<!--                    <b-form-checkbox v-show="!isSelectedView && !isHideView" :id="item.name"-->
-<!--                                     v-model="item.selected"></b-form-checkbox>-->
-                </div>
-
-            </b-card>
+            </div>
         </b-row>
     </div>
 </template>
@@ -242,6 +238,17 @@
                 }
                 this.loadFiles();
             },
+            downloadJson() {
+                this.selectedVideos = [];
+                for (let i = 0; i < this.files.length; i++) {
+                    if (this.files[i].selected) {
+                        this.selectedVideos.push(this.files[i])
+                    }
+                }
+                for (let i = 0 ; i < this.selectedVideos.length ; i++) {
+                    window.open(this.selectedVideos[i].jsonUrl, "_blank");
+                }
+            },
             refreshVideoProgress(bool) {
                 if (bool) {
                     this.refreshVideoFunc = window.setInterval(() => {
@@ -285,5 +292,6 @@
 
     .videoBox {
         flex-direction: row;
+        padding: 5px 5px 0 5px;
     }
 </style>

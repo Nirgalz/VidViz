@@ -45,3 +45,4 @@ videos/
 ffmpeg/
 
 !.mvn/wrapper/maven-wrapper.jar
+/backend/src/main/resources/public/

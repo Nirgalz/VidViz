@@ -1,20 +1,24 @@
 <template>
     <div>
-        <div class="filesActions">
-            <b-btn variant="warning" @click="selectedAction = 'import'">
-                Scan folder
-                <b-icon-folder-symlink></b-icon-folder-symlink>
-            </b-btn>
-            |
-            <b-btn variant="success" @click="selectedAction = 'upload'">
-                Upload
-                <b-icon-upload></b-icon-upload>
-            </b-btn>
-            |
-            <b-btn variant="info" @click="selectedAction = 'explorer'">
-                Explorer
-                <b-icon-folder></b-icon-folder>
-            </b-btn>
+        <div>
+            <b-dropdown id="menu" class="m-md-2" no-caret>
+                <template v-slot:button-content>
+                    <b-icon-list></b-icon-list>
+                </template>
+                <b-dropdown-item @click="selectedAction = 'explorer'" :active="selectedAction === 'explorer'">
+                    Explorer
+                    <b-icon-folder></b-icon-folder>
+                </b-dropdown-item>
+                <b-dropdown-divider></b-dropdown-divider>
+                <b-dropdown-item @click="selectedAction = 'import'" :active="selectedAction === 'import'">
+                    Scan folder
+                    <b-icon-folder-symlink></b-icon-folder-symlink>
+                </b-dropdown-item>
+                <b-dropdown-item @click="selectedAction = 'upload'" :active="selectedAction === 'upload'">
+                    Upload
+                    <b-icon-upload></b-icon-upload>
+                </b-dropdown-item>
+            </b-dropdown>
         </div>
 
         <div>
@@ -66,6 +70,13 @@
 <style scoped>
     .filesActions{
         margin-bottom: 10px;
+    }
+
+    #menu {
+        position: fixed;
+        top : 0px;
+        left: 0px;
+        z-index: 1000;
     }
 
   /*.component-fade-enter-active, .component-fade-leave-active {*/

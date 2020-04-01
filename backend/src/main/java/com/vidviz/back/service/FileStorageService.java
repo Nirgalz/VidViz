@@ -9,6 +9,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface FileStorageService {
+
     public void init();
 
     public void save(MultipartFile file, String pageName);
@@ -31,4 +32,6 @@ public interface FileStorageService {
     void moveFolder(String folderName) throws IOException;
 
     String[] getFilesInFolder(String folderName);
+
+    String getVideosfolder();
 }

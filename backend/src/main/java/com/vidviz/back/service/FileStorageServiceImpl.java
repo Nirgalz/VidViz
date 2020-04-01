@@ -18,8 +18,10 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class FileStorageServiceImpl implements FileStorageService {
 
-    private final Path root = Paths.get("uploads");
+    public static final String VIDEOSFOLDER ="videos/";
+    private final Path root = Paths.get(VIDEOSFOLDER);
     private final Path temp = Paths.get("temp");
+
 
     @Override
     public void init() {
@@ -35,10 +37,14 @@ public class FileStorageServiceImpl implements FileStorageService {
         }
     }
 
+    public String getVideosfolder(){
+        return VIDEOSFOLDER;
+    }
+
     @Override
     public void save(MultipartFile file, String pageName) {
         try {
-            Path folder = Paths.get("uploads/" + pageName);
+            Path folder = Paths.get(VIDEOSFOLDER + pageName);
             if (Files.notExists(folder)) {
                 Files.createDirectory(folder);
             }
@@ -50,7 +56,7 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     @Override
     public FileSystemResource load(String filename, String folderName) {
-        Path folder = Paths.get("uploads/" + folderName);
+        Path folder = Paths.get(VIDEOSFOLDER + folderName);
 
         Path file = folder.resolve(filename);
         FileSystemResource resource = new FileSystemResource(file);
@@ -65,12 +71,12 @@ public class FileStorageServiceImpl implements FileStorageService {
     @Override
     public void editFolderName(String oldName, String newName) throws IOException {
 
-        Files.move(Paths.get("uploads/" + oldName), Paths.get("uploads/" + newName));
+        Files.move(Paths.get(VIDEOSFOLDER + oldName), Paths.get(VIDEOSFOLDER + newName));
     }
 
     @Override
     public void deleteFolder(String folder) throws IOException {
-        FileSystemUtils.deleteRecursively(Paths.get("uploads/" + folder));
+        FileSystemUtils.deleteRecursively(Paths.get(VIDEOSFOLDER + folder));
     }
 
     @Override
@@ -90,7 +96,7 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     @Override
     public void deleteFile(String folderName, String fileName) throws IOException {
-        Path file = Paths.get("uploads/"+folderName+"/"+fileName);
+        Path file = Paths.get(VIDEOSFOLDER+folderName+"/"+fileName);
         Files.deleteIfExists(file);
     }
 

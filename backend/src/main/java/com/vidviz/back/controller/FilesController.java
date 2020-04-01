@@ -34,18 +34,18 @@ public class FilesController {
     private static final Logger LOG = LoggerFactory.getLogger(FilesController.class);
 
     @Autowired
-    FileStorageService storageService;
+    private FileStorageService storageService;
 
     @Autowired
-    FolderService folderService;
+    private FolderService folderService;
 
     @Autowired
-    VideoService videoService;
+    private VideoService videoService;
 
     @Autowired
-    ServletContext servletContext;
+    private ServletContext servletContext;
 
-    VideoEncodingService videoEncodingService = new VideoEncodingService();
+    private VideoEncodingService videoEncodingService = new VideoEncodingService();
 
     @PostMapping("api/upload")
     public ResponseEntity<ResponseMessage> uploadFile(@RequestParam("file") MultipartFile[] files, @RequestParam("pageName") String folderName) {
@@ -107,13 +107,13 @@ public class FilesController {
     public ResponseEntity<List<VideoFront>> getFilesByFolder(@PathVariable String folder) {
         List<VideoFront> filesFront = new ArrayList<>();
         List<Video> videos = folderService.getFolderByName(folder).getVideos();
-        if (Files.exists(Paths.get("uploads/"+folder+"/thumbnails"))) {
+        if (Files.exists(Paths.get(storageService.getVideosfolder() +folder+"/thumbnails"))) {
             folder += "/thumbnails";
         }
         for (Video video : videos) {
             filesFront.add(new VideoFront(video.getId(), video.getName(),
-                    "http://localhost:8080/uploads/" + folder + "/" + video.getName(),
-                    "http://localhost:8080/uploads/" + folder + "/" + video.getJson()));
+                    "http://localhost:8080/" + storageService.getVideosfolder() + folder + "/" + video.getName(),
+                    "http://localhost:8080/" + storageService.getVideosfolder() + folder + "/" + video.getJson()));
         }
         return ResponseEntity.status(HttpStatus.OK).body(filesFront);
     }
@@ -237,7 +237,7 @@ public class FilesController {
         }
 
         for (String folderName : newFolders) {
-            if (Files.exists(Paths.get("uploads/" + folderName))) {
+            if (Files.exists(Paths.get(storageService.getVideosfolder() + folderName))) {
                 LOG.info("folder " + folderName + " already exists");
                 return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(folderName + " folder already exists"));
             }

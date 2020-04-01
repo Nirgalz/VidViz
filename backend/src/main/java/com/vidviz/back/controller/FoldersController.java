@@ -13,8 +13,13 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
@@ -52,6 +57,15 @@ public class FoldersController {
                 newFolderCount.addAndGet(1);
                 Folder folder = new Folder();
                 folder.setName(folderName);
+                try {
+                    BasicFileAttributes attr = Files.readAttributes(
+                            Paths.get(storageService.getVideosfolder() + folderName), BasicFileAttributes.class
+                    );
+                    folder.setCreated(new Date(attr.creationTime().toMillis()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
                 folderService.saveFolder(folder);
 
                 List<String> jsonFiles = new ArrayList<>();

@@ -38,6 +38,7 @@
                 fields: [
                     "name",
                     "itemNumbers",
+                    "created",
                     "actions"
                 ],
                 editOldName: "",

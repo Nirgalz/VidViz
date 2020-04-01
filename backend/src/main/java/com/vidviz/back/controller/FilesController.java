@@ -93,7 +93,7 @@ public class FilesController {
         List<Folder> folders = folderService.findAll();
         List<FolderFront> foldersFront = new ArrayList<>();
         for (Folder folder : folders) {
-            foldersFront.add(new FolderFront(folder.getName(), folder.getNumberOfFiles()));
+            foldersFront.add(new FolderFront(folder.getName(), folder.getNumberOfFiles(), folder.getCreated()));
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(foldersFront);

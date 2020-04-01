@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity(name = "folder")
@@ -13,8 +14,8 @@ public class Folder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name;
+    private Date created;
 
 
     @OneToMany(
@@ -23,6 +24,22 @@ public class Folder {
             orphanRemoval = true
     )
     private List<Video> videos = new ArrayList<>();
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
+    }
 
     public int getNumberOfFiles() {
         return videos.size();

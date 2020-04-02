@@ -117,13 +117,15 @@
         name: "VideoPage",
         data() {
             return {
-                files: [],
+                videos: [],
+                videosHQ: [],
                 displayedVideos: [],
                 players: [],
                 videoSize: 50,
                 videoWidth: 150,
                 videoHeight: 150,
                 selectedVideos: [],
+                selectedHQVideos: [],
                 isSelectedView: false,
                 isHideView: false,
                 play: false,
@@ -211,13 +213,13 @@
             toggleControls() {
                 this.isControlsVisible = !this.isControlsVisible;
                 for (let i = 0; i < this.players.length; i++) {
-                    this.players[i].controls = !this.players[i].controls;
+                    this.players[i].controls = this.isControlsVisible;
                 }
             },
             searchFile() {
                 this.unSelect();
-                for (let i = 0; i < this.files.length; i++) {
-                    if (this.files[i].fileName.includes(this.textSearch)) {
+                for (let i = 0; i < this.videos.length; i++) {
+                    if (this.videos[i].fileName.includes(this.textSearch)) {
                         this.selectTile(i);
                     }
                 }
@@ -304,19 +306,19 @@
             },
             selectTile(index) {
                 let tile = "tile-" + index;
-                if (this.files[index].selected) {
-                    this.files[index].selected = false;
+                if (this.videos[index].selected) {
+                    this.videos[index].selected = false;
                     this.$refs[tile][0].style.backgroundColor = '#2d2d2d';
                 } else {
-                    this.files[index].selected = true;
+                    this.videos[index].selected = true;
                     this.$refs[tile][0].style.backgroundColor = 'rgb(103,117,127)';
                 }
 
             },
             unSelect() {
-                for (let i = 0; i < this.files.length; i++) {
-                    if (this.files[i].selected === true) {
-                        this.files[i].selected = false;
+                for (let i = 0; i < this.videos.length; i++) {
+                    if (this.videos[i].selected === true) {
+                        this.videos[i].selected = false;
                         this.$refs["tile-" + i][0].style.backgroundColor = '#2d2d2d';
                     }
                 }
@@ -324,43 +326,57 @@
             viewSelection(bool) {
                 this.isSelectedView = bool;
                 this.selectedVideos = [];
+                this.selectedHQVideos = [];
 
                 if (bool) {
-                    for (let i = 0; i < this.files.length; i++) {
-                        if (this.files[i].selected) {
-                            this.selectedVideos.push(this.files[i])
+                    for (let i = 0; i < this.videos.length; i++) {
+                        if (this.videos[i].selected) {
+                            this.selectedVideos.push(this.videos[i]);
+                            this.selectedHQVideos.push(this.videosHQ[i]);
                         }
                     }
-                } else this.selectedVideos = this.files;
+                } else this.selectedVideos = this.videos;
 
                 if (this.selectedVideos.length > 0) {
-                    this.displayedVideos = this.selectedVideos;
+                    if (this.selectedVideos.length <= 8){
+                        this.displayedVideos = this.selectedHQVideos;
+                    }
+                    else {
+                        this.displayedVideos = this.selectedVideos;
+                    }
                     this.changeVideoSize();
                 }
             },
             hideSelection(bool) {
                 this.isHideView = bool;
                 this.selectedVideos = [];
+                this.selectedHQVideos = [];
 
                 if (bool) {
-                    for (let i = 0; i < this.files.length; i++) {
-                        if (!this.files[i].selected) {
-                            this.selectedVideos.push(this.files[i])
+                    for (let i = 0; i < this.videos.length; i++) {
+                        if (!this.videos[i].selected) {
+                            this.selectedVideos.push(this.videos[i]);
+                            this.selectedHQVideos.push(this.videosHQ[i]);
                         }
                     }
-                } else this.selectedVideos = this.files;
+                } else this.selectedVideos = this.videos;
 
                 if (this.selectedVideos.length > 0) {
-                    this.displayedVideos = this.selectedVideos;
+                    if (this.selectedVideos.length <= 8){
+                        this.displayedVideos = this.selectedHQVideos;
+                    }
+                    else {
+                        this.displayedVideos = this.selectedVideos;
+                    }
                     this.changeVideoSize();
                 }
             },
             deleteSelection() {
                 this.selectedVideos = [];
 
-                for (let i = 0; i < this.files.length; i++) {
-                    if (this.files[i].selected) {
-                        UploadService.deleteFile(this.files[i].id);
+                for (let i = 0; i < this.videos.length; i++) {
+                    if (this.videos[i].selected) {
+                        UploadService.deleteFile(this.videos[i].id);
                         let tile = "tile-" + i;
                         this.$refs[tile][0].style.display = "none";
                     }
@@ -369,13 +385,16 @@
             },
             downloadJson() {
                 this.selectedVideos = [];
-                for (let i = 0; i < this.files.length; i++) {
-                    if (this.files[i].selected) {
-                        this.selectedVideos.push(this.files[i])
+                for (let i = 0; i < this.videos.length; i++) {
+                    if (this.videos[i].selected) {
+                        this.selectedVideos.push(this.videos[i])
                     }
                 }
                 for (let i = 0; i < this.selectedVideos.length; i++) {
-                    window.open(this.selectedVideos[i].jsonUrl, "_blank");
+                    let jsonUrl = this.selectedVideos[i].jsonUrl;
+                    if (!jsonUrl.includes("/null")) {
+                        window.open(this.selectedVideos[i].jsonUrl, "_blank");
+                    }
                 }
             },
             refreshVideoProgress(bool) {
@@ -391,11 +410,21 @@
             },
             loadFiles() {
                 UploadService.getFiles(this.selectedFolder).then(response => {
-                    this.files = response.data;
-                    for (let i = 0; i < this.files.length; i++) {
-                        this.files[i].selected = false;
+                    let allVideos = response.data;
+
+                    for (let i = 0; i < allVideos.length; i++) {
+                        allVideos[i].selected = false;
+                        if (allVideos[i].url.includes("/thumbnails")) {
+                            this.videos.push(allVideos[i]);
+                        } else {
+                            this.videosHQ.push(allVideos[i]);
+                        }
                     }
-                    this.displayedVideos = this.files;
+                    if (this.videos.length === 0) {
+                        this.videos.push(this.videosHQ)
+                    }
+
+                    this.displayedVideos = this.videos;
                 }).then(() => {
                     this.players = this.$refs.videoPlayer;
                     for (let i = 0; i < this.players.length; i++) {

@@ -104,14 +104,20 @@ public class FilesController {
     public ResponseEntity<List<VideoFront>> getFilesByFolder(@PathVariable String folder) {
         List<VideoFront> filesFront = new ArrayList<>();
         List<Video> videos = folderService.getFolderByName(folder).getVideos();
-        if (Files.exists(Paths.get(storageService.getVideosfolder() +folder+"/thumbnails"))) {
-            folder += "/thumbnails";
-        }
         for (Video video : videos) {
             filesFront.add(new VideoFront(video.getId(), video.getName(),
                     "http://localhost:8080/" + storageService.getVideosfolder() + folder + "/" + video.getName(),
                     "http://localhost:8080/" + storageService.getVideosfolder() + folder + "/" + video.getJson()));
         }
+        if (Files.exists(Paths.get(storageService.getVideosfolder() +folder+"/thumbnails"))) {
+            folder += "/thumbnails";
+            for (Video video : videos) {
+                filesFront.add(new VideoFront(video.getId(), video.getName(),
+                        "http://localhost:8080/" + storageService.getVideosfolder() + folder + "/" + video.getName(),
+                        "http://localhost:8080/" + storageService.getVideosfolder() + folder.replace("/thumbnails", "") + "/" + video.getJson()));
+            }
+        }
+
         return ResponseEntity.status(HttpStatus.OK).body(filesFront);
     }
 
@@ -154,7 +160,7 @@ public class FilesController {
         video.ifPresent(video1 -> {
             try {
                 storageService.deleteFile(video1.getFolder().getName(), video1.getName());
-
+                storageService.deleteFile(video1.getFolder().getName() + "/thumbnails/", video1.getName());
                 if (video1.getJson() != null) {
                     storageService.deleteFile(video1.getFolder().getName(), video1.getJson());
                 }

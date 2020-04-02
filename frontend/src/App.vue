@@ -1,10 +1,31 @@
 <template>
   <div id="app">
-    <div id="nav" style="visibility: hidden">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/files">Files</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
+    <b-dropdown id="menu" class="m-md-2" no-caret>
+      <template v-slot:button-content>
+        <b-icon-list></b-icon-list>
+      </template>
+      <b-dropdown-item>
+        <router-link to="/explorer">
+          Explorer
+          <b-icon-folder></b-icon-folder></router-link>
+      </b-dropdown-item>
+
+      <b-dropdown-divider></b-dropdown-divider>
+      <b-dropdown-item >
+        <router-link to="/scan">
+          Scan folder
+          <b-icon-folder-symlink></b-icon-folder-symlink>
+        </router-link>
+
+      </b-dropdown-item>
+      <b-dropdown-item>
+        <router-link to="/upload">
+          Upload
+          <b-icon-upload></b-icon-upload>
+        </router-link>
+
+      </b-dropdown-item>
+    </b-dropdown>
     <router-view/>
   </div>
 </template>
@@ -26,6 +47,13 @@
   color: rgb(214, 229, 239);
   background-color: #2d2d2d;
 }
+
+  #menu {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    z-index: 1000;
+  }
 
 #nav {
   /*padding: 30px;*/

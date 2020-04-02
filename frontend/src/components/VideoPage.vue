@@ -92,9 +92,6 @@
 
     export default {
         name: "VideoPage",
-        props: {
-            selectedFolder: String
-        },
         data() {
             return {
                 files: [],
@@ -354,6 +351,7 @@
             }
         },
         mounted() {
+            this.selectedFolder = this.$route.params.folder;
             this.loadFiles();
         }
     }
@@ -373,5 +371,6 @@
         padding: 5px 5px 0 5px;
         width:fit-content;
         height:fit-content;
+        white-space: nowrap;
     }
 </style>

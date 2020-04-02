@@ -2,11 +2,12 @@
     <div>
         <b-table :items="folders" :fields="fields">
             <template v-slot:cell(actions)="data">
+                <router-link :to="{name : 'Videos', params : {folder : data.item.name}}">
+                    <b-btn v-b-tooltip.hover title="View">
+                        <b-icon-eye-fill></b-icon-eye-fill>
+                    </b-btn>
+                </router-link>
 
-                <b-btn @click="loadFilesToPage(data.item.name)"
-                       v-b-tooltip.hover title="View">
-                    <b-icon-eye-fill></b-icon-eye-fill>
-                </b-btn>
                 |
                 <b-btn v-b-modal.modal-editFolder
                        @click="selectFolderToEdit(data.item.name)"
@@ -49,9 +50,6 @@
             }
         },
         methods: {
-            loadFilesToPage(item) {
-                this.$emit('loadFiles', item)
-            },
             selectFolderToEdit(name) {
                 this.editOldName = name;
             },

@@ -2,7 +2,7 @@
     <div>
         <b-container>
             <b-row class="selectActions">
-                <b-col >
+                <b-col>
                     <div id="videoControls">
                         <b-btn v-if="!play"
                                @click="playPauseVideos(true)"
@@ -134,7 +134,8 @@
                 textSearch: "",
                 isAutoLoop: false,
                 isControlsVisible: false,
-                playSpeed : 1
+                playSpeed: 1,
+                ratio: 0
             }
         },
         created() {
@@ -195,8 +196,8 @@
                 }
             },
             reduceSpeed() {
-               this.playSpeed -= 1;
-               this.playSpeed < 1 ? this.playSpeed = 1 : this.playSpeed;
+                this.playSpeed -= 1;
+                this.playSpeed < 1 ? this.playSpeed = 1 : this.playSpeed;
                 for (let i = 0; i < this.players.length; i++) {
                     this.players[i].playbackRate = this.playSpeed;
                 }
@@ -280,30 +281,26 @@
                 let cell_size2 = x / ncols2;
 
 // Find the best values
-                let nrows, ncols, cell_size;
+//                 let nrows, ncols;
+                let cell_size;
                 if (cell_size1 < cell_size2) {
-                    nrows = nrows2;
-                    ncols = ncols2;
+                    // nrows = nrows2;
+                    // ncols = ncols2;
                     cell_size = cell_size2;
                 } else {
-                    nrows = nrows1;
-                    ncols = ncols1;
+                    // nrows = nrows1;
+                    // ncols = ncols1;
                     cell_size = cell_size1;
                 }
-                console.log(cell_size);
-                console.log(nrows);
-                console.log(ncols);
+                // console.log(cell_size);
+                // console.log(nrows);
+                // console.log(ncols);
                 let size = cell_size - 10;
                 if (size < 150) {
                     size = 150;
                 }
-
-                // for (let i = 0; i < this.players.length; i++) {
-                // this.players[i].player.width(size);
-                // this.players[i].player.height(size);
                 this.videoWidth = size;
-                this.videoHeight = size;
-                // }
+                this.videoHeight = size / this.ratio;
             },
             selectTile(index) {
                 let tile = "tile-" + index;
@@ -404,6 +401,7 @@
                     for (let i = 0; i < this.players.length; i++) {
                         this.players[i].volume = 0;
                     }
+                    this.ratio = this.players[0].videoWidth / this.players[0].videoHeight;
                     this.changeVideoSize();
                 });
             }
@@ -431,11 +429,13 @@
         height: fit-content;
         white-space: nowrap;
     }
+
     #speed {
         width: 50px;
     }
 
-    #videoControls{
+
+    #videoControls {
         display: flex;
     }
 </style>

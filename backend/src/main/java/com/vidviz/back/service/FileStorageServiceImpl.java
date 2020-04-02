@@ -20,7 +20,6 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     public static final String VIDEOSFOLDER ="videos/";
     private final Path root = Paths.get(VIDEOSFOLDER);
-    private final Path temp = Paths.get("temp");
 
 
     @Override

@@ -24,6 +24,7 @@
                     </b-form-input>
                 </b-col>
                 <b-col>
+                    <b-form-input v-model="textSearch" size="sm" placeholder="Search for file" @update="searchFile"></b-form-input>
                     <b-btn @click="unSelect"
                            :disabled="isSelectedView || isHideView"
                            v-b-tooltip.hover title="Unselect all elements [C]">
@@ -110,6 +111,7 @@
                 videoDuration: 0,
                 refreshVideoFunc: null,
                 startTime: 0,
+                textSearch : ""
             }
         },
         created() {
@@ -120,11 +122,9 @@
         },
         methods: {
             doCommand(e) {
-                //let cmd = String.fromCharCode(e.keyCode).toLowerCase();
-                e.preventDefault();
-                console.log(e.keyCode);
                 switch (e.keyCode) {
                     case 32 :
+                        e.preventDefault();
                         this.playPauseVideos(!this.play);
                         break;
                     case 99 :
@@ -156,6 +156,14 @@
                             this.deleteSelection();
                         }
                         break;
+                }
+            },
+            searchFile() {
+                this.unSelect();
+                for (let i = 0 ; i < this.files.length ; i++) {
+                    if (this.files[i].fileName.includes(this.textSearch)) {
+                        this.selectTile(i);
+                    }
                 }
             },
             playPauseVideos(play) {
@@ -235,12 +243,12 @@
                     size = 150;
                 }
 
-                for (let i = 0; i < this.players.length; i++) {
+                // for (let i = 0; i < this.players.length; i++) {
                     // this.players[i].player.width(size);
                     // this.players[i].player.height(size);
                     this.videoWidth = size;
                     this.videoHeight = size;
-                }
+                // }
             },
             selectTile(index) {
                 let tile = "tile-" + index;
@@ -341,6 +349,7 @@
                     for (let i = 0; i < this.players.length; i++) {
                         this.players[i].volume = 0;
                     }
+                    this.changeVideoSize();
                 });
             }
         },
@@ -362,5 +371,7 @@
     .videoBox {
         flex-direction: row;
         padding: 5px 5px 0 5px;
+        width:fit-content;
+        height:fit-content;
     }
 </style>

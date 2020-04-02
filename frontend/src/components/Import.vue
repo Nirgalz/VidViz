@@ -14,7 +14,7 @@
             </li>
         </ul>
 
-        <b-btn @click="getFolders">Refresh <b-icon-bootstrap-reboot></b-icon-bootstrap-reboot></b-btn>
+        <b-btn @click="getFolders">Refresh <b-icon-arrow-repeat></b-icon-arrow-repeat></b-btn>
     </div>
 </template>
 

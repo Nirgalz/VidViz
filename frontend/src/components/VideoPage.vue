@@ -2,18 +2,39 @@
     <div>
         <b-container>
             <b-row class="selectActions">
-                <b-col>
-                    <div id="videoControls"></div>
-                    <b-btn v-if="!play"
-                           @click="playPauseVideos(true)"
-                           v-b-tooltip.hover title="Play [SPACEBAR]">
-                        <b-icon-play-fill></b-icon-play-fill>
-                    </b-btn>
-                    <b-btn v-if="play"
-                           @click="playPauseVideos(false)"
-                           v-b-tooltip.hover title="Pause [SPACEBAR]">
-                        <b-icon-pause-fill></b-icon-pause-fill>
-                    </b-btn>
+                <b-col >
+                    <div id="videoControls">
+                        <b-btn v-if="!play"
+                               @click="playPauseVideos(true)"
+                               v-b-tooltip.hover title="Play [SPACEBAR]">
+                            <b-icon-play-fill></b-icon-play-fill>
+                        </b-btn>
+                        <b-btn v-if="play"
+                               @click="playPauseVideos(false)"
+                               v-b-tooltip.hover title="Pause [SPACEBAR]">
+                            <b-icon-pause-fill></b-icon-pause-fill>
+                        </b-btn>
+                        |
+                        <b-btn @click="reduceSpeed">
+                            <b-icon-dash></b-icon-dash>
+                        </b-btn>
+                        <b-form-input id="speed" v-model="playSpeed"></b-form-input>
+                        <b-btn>
+                            <b-icon-plus @click="increaseSpeed"></b-icon-plus>
+                        </b-btn>
+                        |
+                        <!--                    <div id="videoControls"></div>-->
+                        <b-btn @click="toggleAutoLoop"
+                               :pressed="isAutoLoop"
+                               v-b-tooltip.hover title="Loop [L]">
+                            <b-icon-arrow-repeat></b-icon-arrow-repeat>
+                        </b-btn>
+                        <b-btn @click="toggleControls"
+                               :pressed="isControlsVisible"
+                               v-b-tooltip.hover title="Show controls [M]">
+                            <b-icon-camera-video-fill></b-icon-camera-video-fill>
+                        </b-btn>
+                    </div>
                     <b-form-input
                             @click="startVideoFrom()"
                             v-model="videoCurrentTime"
@@ -24,7 +45,8 @@
                     </b-form-input>
                 </b-col>
                 <b-col>
-                    <b-form-input v-model="textSearch" size="sm" placeholder="Search for file" @update="searchFile"></b-form-input>
+                    <b-form-input v-model="textSearch" size="sm" placeholder="Search for file"
+                                  @update="searchFile"></b-form-input>
                     <b-btn @click="unSelect"
                            :disabled="isSelectedView || isHideView"
                            v-b-tooltip.hover title="Unselect all elements [C]">
@@ -76,10 +98,11 @@
 
                     <video ref="videoPlayer"
                            class="videoPlayers"
+                           loop
+                           muted
                            :src="item.url"
                            :width="videoWidth"
                            :height="videoHeight">
-
                     </video>
                 </div>
             </div>
@@ -108,7 +131,10 @@
                 videoDuration: 0,
                 refreshVideoFunc: null,
                 startTime: 0,
-                textSearch : ""
+                textSearch: "",
+                isAutoLoop: false,
+                isControlsVisible: false,
+                playSpeed : 1
             }
         },
         created() {
@@ -119,6 +145,7 @@
         },
         methods: {
             doCommand(e) {
+                console.log(e.keyCode);
                 switch (e.keyCode) {
                     case 32 :
                         e.preventDefault();
@@ -153,11 +180,42 @@
                             this.deleteSelection();
                         }
                         break;
+                    case 108 :
+                        this.toggleAutoLoop();
+                        break;
+                    case 109 :
+                        this.toggleControls();
+                        break;
+                }
+            },
+            increaseSpeed() {
+                this.playSpeed += 1;
+                for (let i = 0; i < this.players.length; i++) {
+                    this.players[i].playbackRate = this.playSpeed;
+                }
+            },
+            reduceSpeed() {
+               this.playSpeed -= 1;
+               this.playSpeed < 1 ? this.playSpeed = 1 : this.playSpeed;
+                for (let i = 0; i < this.players.length; i++) {
+                    this.players[i].playbackRate = this.playSpeed;
+                }
+            },
+            toggleAutoLoop() {
+                this.isAutoLoop = !this.isAutoLoop;
+                for (let i = 0; i < this.players.length; i++) {
+                    this.players[i].loop = !this.players[i].loop;
+                }
+            },
+            toggleControls() {
+                this.isControlsVisible = !this.isControlsVisible;
+                for (let i = 0; i < this.players.length; i++) {
+                    this.players[i].controls = !this.players[i].controls;
                 }
             },
             searchFile() {
                 this.unSelect();
-                for (let i = 0 ; i < this.files.length ; i++) {
+                for (let i = 0; i < this.files.length; i++) {
                     if (this.files[i].fileName.includes(this.textSearch)) {
                         this.selectTile(i);
                     }
@@ -241,10 +299,10 @@
                 }
 
                 // for (let i = 0; i < this.players.length; i++) {
-                    // this.players[i].player.width(size);
-                    // this.players[i].player.height(size);
-                    this.videoWidth = size;
-                    this.videoHeight = size;
+                // this.players[i].player.width(size);
+                // this.players[i].player.height(size);
+                this.videoWidth = size;
+                this.videoHeight = size;
                 // }
             },
             selectTile(index) {
@@ -369,8 +427,15 @@
     .videoBox {
         flex-direction: row;
         padding: 5px 5px 0 5px;
-        width:fit-content;
-        height:fit-content;
+        width: fit-content;
+        height: fit-content;
         white-space: nowrap;
+    }
+    #speed {
+        width: 50px;
+    }
+
+    #videoControls{
+        display: flex;
     }
 </style>

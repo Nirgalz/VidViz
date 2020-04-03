@@ -14,7 +14,7 @@
                                v-b-tooltip.hover title="Pause [SPACEBAR]">
                             <b-icon-pause-fill></b-icon-pause-fill>
                         </b-btn>
-                        |
+                        <div>|</div>
                         <b-btn @click="reduceSpeed">
                             <b-icon-dash></b-icon-dash>
                         </b-btn>
@@ -44,46 +44,54 @@
                             :max="videoDuration">
                     </b-form-input>
                 </b-col>
+                <b-col cols="1">
+                    <H5>{{folderName}}</H5>
+                </b-col>
                 <b-col>
                     <b-form-input v-model="textSearch" size="sm" placeholder="Search for file"
                                   @update="searchFile"></b-form-input>
-                    <b-btn @click="unSelect"
-                           :disabled="isSelectedView || isHideView"
-                           v-b-tooltip.hover title="Unselect all elements [C]">
-                        <b-icon-unlock-fill></b-icon-unlock-fill>
-                    </b-btn>
-                    <b-btn :disabled="isHideView"
-                           v-if="!isSelectedView"
-                           @click="viewSelection(true)"
-                           v-b-tooltip.hover title="View Selection [V]">
-                        <b-icon-eye-fill></b-icon-eye-fill>
-                    </b-btn>
-                    <b-btn v-if="isSelectedView"
-                           @click="viewSelection(false)"
-                           v-b-tooltip.hover title="Un-view Selection [V]">
-                        <b-icon-eye-slash-fill></b-icon-eye-slash-fill>
-                    </b-btn>
-                    <b-btn :disabled="isSelectedView"
-                           v-if="!isHideView"
-                           @click="hideSelection(true)"
-                           v-b-tooltip.hover title="Hide Selection [B]">
-                        <b-icon-eye-slash-fill></b-icon-eye-slash-fill>
-                    </b-btn>
-                    <b-btn v-if="isHideView"
-                           @click="hideSelection(false)"
-                           v-b-tooltip.hover title="Un-hide Selection [B]">
-                        <b-icon-eye-fill></b-icon-eye-fill>
-                    </b-btn>
-                    <b-btn :disabled="isSelectedView || isHideView"
-                           @click="downloadJson"
-                           v-b-tooltip.hover title="Download json [J]">
-                        <b-icon-download></b-icon-download>
-                    </b-btn>
-                    <b-btn :disabled="isSelectedView || isHideView"
-                           @click="deleteSelection"
-                           v-b-tooltip.hover title="Delete Selected [S]">
-                        <b-icon-trash-fill></b-icon-trash-fill>
-                    </b-btn>
+                    <div id="filesControls">
+                        <p>{{getSelectedVideosIds().length}} videos selected from {{videos.length}} videos  </p>
+                        <b-btn @click="unSelectAll"
+                               :disabled="isSelectedView || isHideView"
+                               v-b-tooltip.hover title="Unselect all elements [C]">
+                            <b-icon-unlock-fill></b-icon-unlock-fill>
+                        </b-btn>
+                        <b-btn :disabled="isHideView"
+                               v-if="!isSelectedView"
+                               @click="viewSelection(true)"
+                               v-b-tooltip.hover title="View Selection [V]">
+                            <b-icon-eye-fill></b-icon-eye-fill>
+                        </b-btn>
+                        <b-btn v-if="isSelectedView"
+                               @click="viewSelection(false)"
+                               v-b-tooltip.hover title="Un-view Selection [V]">
+                            <b-icon-eye-slash-fill></b-icon-eye-slash-fill>
+                        </b-btn>
+                        <b-btn :disabled="isSelectedView"
+                               v-if="!isHideView"
+                               @click="hideSelection(true)"
+                               v-b-tooltip.hover title="Hide Selection [B]">
+                            <b-icon-eye-slash-fill></b-icon-eye-slash-fill>
+                        </b-btn>
+                        <b-btn v-if="isHideView"
+                               @click="hideSelection(false)"
+                               v-b-tooltip.hover title="Un-hide Selection [B]">
+                            <b-icon-eye-fill></b-icon-eye-fill>
+                        </b-btn>
+                        |
+                        <b-btn :disabled="isSelectedView || isHideView"
+                               @click="downloadJson"
+                               v-b-tooltip.hover title="Download json [J]">
+                            <b-icon-download></b-icon-download>
+                        </b-btn>
+                        <b-btn :disabled="isSelectedView || isHideView"
+                               @click="deleteSelection"
+                               v-b-tooltip.hover title="Delete Selected [S]">
+                            <b-icon-trash-fill></b-icon-trash-fill>
+                        </b-btn>
+                    </div>
+
                 </b-col>
             </b-row>
         </b-container>
@@ -117,6 +125,7 @@
         name: "VideoPage",
         data() {
             return {
+                folderName : "",
                 videos: [],
                 videosHQ: [],
                 displayedVideos: [],
@@ -156,7 +165,7 @@
                         break;
                     case 99 :
                         if (!this.isHideView && !this.isSelectedView) {
-                            this.unSelect();
+                            this.unSelectAll();
                         }
                         break;
                     case 118 :
@@ -217,7 +226,7 @@
                 }
             },
             searchFile() {
-                this.unSelect();
+                this.unSelectAll();
                 for (let i = 0; i < this.videos.length; i++) {
                     if (this.videos[i].fileName.includes(this.textSearch)) {
                         this.selectTile(i);
@@ -264,39 +273,29 @@
                 let ncols_float = Math.sqrt(n * ratio);
                 let nrows_float = n / ncols_float;
 
-// Find best option filling the whole height
                 let nrows1 = Math.ceil(nrows_float);
                 let ncols1 = Math.ceil(n / nrows1);
                 while (nrows1 * ratio < ncols1) {
                     nrows1++;
                     ncols1 = Math.ceil(n / nrows1);
                 }
-                let cell_size1 = y / nrows1;
 
-// Find best option filling the whole width
+                let cell_size1 = y / nrows1;
                 let ncols2 = Math.ceil(ncols_float);
                 let nrows2 = Math.ceil(n / ncols2);
                 while (ncols2 < nrows2 * ratio) {
                     ncols2++;
                     nrows2 = Math.ceil(n / ncols2);
                 }
-                let cell_size2 = x / ncols2;
 
-// Find the best values
-//                 let nrows, ncols;
+                let cell_size2 = x / ncols2;
                 let cell_size;
                 if (cell_size1 < cell_size2) {
-                    // nrows = nrows2;
-                    // ncols = ncols2;
                     cell_size = cell_size2;
                 } else {
-                    // nrows = nrows1;
-                    // ncols = ncols1;
                     cell_size = cell_size1;
                 }
-                // console.log(cell_size);
-                // console.log(nrows);
-                // console.log(ncols);
+
                 let size = cell_size - 10;
                 if (size < 150) {
                     size = 150;
@@ -316,7 +315,7 @@
                     }
                 }
             },
-            unSelect() {
+            unSelectAll() {
                 for (let i = 0; i < this.videos.length; i++) {
                     if (this.videos[i].selected === true) {
                         this.videos[i].selected = false;
@@ -324,55 +323,64 @@
                     }
                 }
             },
-            viewSelection(bool) {
-                this.isSelectedView = bool;
-                this.selectedVideos = [];
-                this.selectedHQVideos = [];
-
-                if (bool) {
-                    for (let i = 0; i < this.videos.length; i++) {
-                        if (this.videos[i].selected) {
-                            this.selectedVideos.push(this.videos[i]);
-                            this.selectedHQVideos.push(this.videosHQ[i]);
+            getVideos(isSelected, quality) {
+                let videos = [];
+                for (let i = 0 ; i < this.videos.length ; i++) {
+                    if (this.videos[i].selected === isSelected) {
+                        if (quality === "LOW") {
+                            videos.push(this.videos[i])
+                        }
+                        else if (quality === "HQ") {
+                            videos.push(this.videosHQ[i])
                         }
                     }
-                } else this.selectedVideos = this.videos;
-
-                if (this.selectedVideos.length > 0) {
-                    if (this.selectedVideos.length <= 8) {
-                        this.displayedVideos = this.selectedHQVideos;
-                    } else {
-                        this.displayedVideos = this.selectedVideos;
-                    }
-                    this.changeVideoSize();
                 }
+                return videos;
+            },
+            getSelectedVideosIds() {
+                let selectedVideosIds = [];
+                for (let i = 0 ; i < this.videos.length ; i++) {
+                    if (this.videos[i].selected) {
+                        selectedVideosIds.push(this.videos[i].id);
+                    }
+                }
+                return selectedVideosIds;
+            },
+            viewSelection(bool) {
+                this.isSelectedView = bool;
+                let selectedVideosIds = this.getSelectedVideosIds();
+                if (this.isSelectedView) {
+                    if (selectedVideosIds.length > 0) {
+                        if (selectedVideosIds.length <= 8) {
+                            this.displayedVideos = this.getVideos(true,"HQ");
+                        } else {
+                            this.displayedVideos = this.getVideos(true,"LOW");
+                        }
+                    }
+                }
+                else {
+                    this.displayedVideos = this.videos;
+                }
+                this.changeVideoSize();
             },
             hideSelection(bool) {
                 this.isHideView = bool;
-                this.selectedVideos = [];
-                this.selectedHQVideos = [];
-
-                if (bool) {
-                    for (let i = 0; i < this.videos.length; i++) {
-                        if (!this.videos[i].selected) {
-                            this.selectedVideos.push(this.videos[i]);
-                            this.selectedHQVideos.push(this.videosHQ[i]);
+                let selectedVideosIds = this.getSelectedVideosIds();
+                if (this.isHideView) {
+                    if (selectedVideosIds.length > 0) {
+                        if (selectedVideosIds.length <= 8) {
+                            this.displayedVideos = this.getVideos(false,"HQ");
+                        } else {
+                            this.displayedVideos = this.getVideos(false,"LOW");
                         }
                     }
-                } else this.selectedVideos = this.videos;
-
-                if (this.selectedVideos.length > 0) {
-                    if (this.selectedVideos.length <= 8) {
-                        this.displayedVideos = this.selectedHQVideos;
-                    } else {
-                        this.displayedVideos = this.selectedVideos;
-                    }
-                    this.changeVideoSize();
                 }
+                else {
+                    this.displayedVideos = this.videos;
+                }
+                this.changeVideoSize();
             },
             deleteSelection() {
-                this.selectedVideos = [];
-
                 for (let i = 0; i < this.videos.length; i++) {
                     if (this.videos[i].selected) {
                         UploadService.deleteFile(this.videos[i].id);
@@ -383,16 +391,13 @@
                 this.loadFiles();
             },
             downloadJson() {
-                this.selectedVideos = [];
                 for (let i = 0; i < this.videos.length; i++) {
                     if (this.videos[i].selected) {
-                        this.selectedVideos.push(this.videos[i])
-                    }
-                }
-                for (let i = 0; i < this.selectedVideos.length; i++) {
-                    let jsonUrl = this.selectedVideos[i].jsonUrl;
-                    if (!jsonUrl.includes("/null")) {
-                        window.open(this.selectedVideos[i].jsonUrl, "_blank");
+                        let jsonUrl = this.videos[i].jsonUrl;
+                        console.log(jsonUrl);
+                        if (!jsonUrl.includes("/null")) {
+                            window.open(this.videos[i].jsonUrl, "_blank");
+                        }
                     }
                 }
             },
@@ -409,6 +414,8 @@
             },
             loadFiles() {
                 UploadService.getFiles(this.selectedFolder).then(response => {
+                    this.videos = [];
+                    this.videosHQ = [];
                     let allVideos = response.data;
 
                     for (let i = 0; i < allVideos.length; i++) {
@@ -437,6 +444,7 @@
         mounted() {
             this.selectedFolder = this.$route.params.folder;
             this.loadFiles();
+            this.folderName = this.$route.params.folder;
         }
     }
 </script>
@@ -461,7 +469,10 @@
     #speed {
         width: 50px;
     }
-
+    #filesControls {
+        display: flex;
+        justify-content: flex-end;
+    }
 
     #videoControls {
         display: flex;

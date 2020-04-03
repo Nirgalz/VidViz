@@ -305,15 +305,16 @@
                 this.videoHeight = size / this.ratio;
             },
             selectTile(index) {
-                let tile = "tile-" + index;
-                if (this.videos[index].selected) {
-                    this.videos[index].selected = false;
-                    this.$refs[tile][0].style.backgroundColor = '#2d2d2d';
-                } else {
-                    this.videos[index].selected = true;
-                    this.$refs[tile][0].style.backgroundColor = 'rgb(103,117,127)';
+                if (!this.isSelectedView && !this.isHideView) {
+                    let tile = "tile-" + index;
+                    if (this.videos[index].selected) {
+                        this.videos[index].selected = false;
+                        this.$refs[tile][0].style.backgroundColor = '#2d2d2d';
+                    } else {
+                        this.videos[index].selected = true;
+                        this.$refs[tile][0].style.backgroundColor = 'rgb(103,117,127)';
+                    }
                 }
-
             },
             unSelect() {
                 for (let i = 0; i < this.videos.length; i++) {
@@ -338,10 +339,9 @@
                 } else this.selectedVideos = this.videos;
 
                 if (this.selectedVideos.length > 0) {
-                    if (this.selectedVideos.length <= 8){
+                    if (this.selectedVideos.length <= 8) {
                         this.displayedVideos = this.selectedHQVideos;
-                    }
-                    else {
+                    } else {
                         this.displayedVideos = this.selectedVideos;
                     }
                     this.changeVideoSize();
@@ -362,10 +362,9 @@
                 } else this.selectedVideos = this.videos;
 
                 if (this.selectedVideos.length > 0) {
-                    if (this.selectedVideos.length <= 8){
+                    if (this.selectedVideos.length <= 8) {
                         this.displayedVideos = this.selectedHQVideos;
-                    }
-                    else {
+                    } else {
                         this.displayedVideos = this.selectedVideos;
                     }
                     this.changeVideoSize();

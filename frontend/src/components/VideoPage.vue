@@ -15,12 +15,14 @@
                             <b-icon-pause-fill></b-icon-pause-fill>
                         </b-btn>
                         <div>|</div>
-                        <b-btn @click="reduceSpeed">
+                        <b-btn @click="decreaseSpeed"
+                               v-b-tooltip.hover title="Decrease speed [NUMPAD -]">
                             <b-icon-dash></b-icon-dash>
                         </b-btn>
                         <b-form-input id="speed" v-model="playSpeed"></b-form-input>
-                        <b-btn>
-                            <b-icon-plus @click="increaseSpeed"></b-icon-plus>
+                        <b-btn  @click="increaseSpeed"
+                                v-b-tooltip.hover title="Increase speed [NUMPAD +]">
+                            <b-icon-plus></b-icon-plus>
                         </b-btn>
                         |
                         <!--                    <div id="videoControls"></div>-->
@@ -46,14 +48,18 @@
                 </b-col>
                 <b-col cols="1">
                     <H5>{{folderName}}</H5>
-                    <b-btn v-if="isShowInfos" @click="showInfos()"><b-icon-info></b-icon-info></b-btn>
-                    <b-btn v-if="!isShowInfos" @click="showInfos()"><b-icon-info-fill></b-icon-info-fill></b-btn>
+                    <b-btn v-if="isShowInfos" @click="showInfos()">
+                        <b-icon-info></b-icon-info>
+                    </b-btn>
+                    <b-btn v-if="!isShowInfos" @click="showInfos()">
+                        <b-icon-info-fill></b-icon-info-fill>
+                    </b-btn>
                 </b-col>
                 <b-col>
                     <b-form-input v-model="textSearch" size="sm" placeholder="Search for file"
                                   @update="searchFile"></b-form-input>
                     <div id="filesControls">
-                        <p>{{getSelectedVideosIds().length}} videos selected from {{videos.length}} videos  </p>
+                        <p>{{getSelectedVideosIds().length}} videos selected from {{videos.length}} videos </p>
                         <b-btn @click="unSelectAll"
                                :disabled="isSelectedView || isHideView"
                                v-b-tooltip.hover title="Unselect all elements [C]">
@@ -129,7 +135,7 @@
         name: "VideoPage",
         data() {
             return {
-                folderName : "",
+                folderName: "",
                 videos: [],
                 videosHQ: [],
                 displayedVideos: [],
@@ -201,6 +207,12 @@
                     case 109 :
                         this.toggleControls();
                         break;
+                    case 45 :
+                        this.decreaseSpeed();
+                        break;
+                    case 43 :
+                        this.increaseSpeed();
+                        break;
                 }
             },
             showInfos() {
@@ -212,7 +224,7 @@
                     this.players[i].playbackRate = this.playSpeed;
                 }
             },
-            reduceSpeed() {
+            decreaseSpeed() {
                 this.playSpeed -= 1;
                 this.playSpeed < 1 ? this.playSpeed = 1 : this.playSpeed;
                 for (let i = 0; i < this.players.length; i++) {
@@ -331,12 +343,11 @@
             },
             getVideos(isSelected, quality) {
                 let videos = [];
-                for (let i = 0 ; i < this.videos.length ; i++) {
+                for (let i = 0; i < this.videos.length; i++) {
                     if (this.videos[i].selected === isSelected) {
                         if (quality === "LOW") {
                             videos.push(this.videos[i])
-                        }
-                        else if (quality === "HQ") {
+                        } else if (quality === "HQ") {
                             videos.push(this.videosHQ[i])
                         }
                     }
@@ -345,7 +356,7 @@
             },
             getSelectedVideosIds() {
                 let selectedVideosIds = [];
-                for (let i = 0 ; i < this.videos.length ; i++) {
+                for (let i = 0; i < this.videos.length; i++) {
                     if (this.videos[i].selected) {
                         selectedVideosIds.push(this.videos[i].id);
                     }
@@ -358,13 +369,12 @@
                 if (this.isSelectedView) {
                     if (selectedVideosIds.length > 0) {
                         if (selectedVideosIds.length <= 8) {
-                            this.displayedVideos = this.getVideos(true,"HQ");
+                            this.displayedVideos = this.getVideos(true, "HQ");
                         } else {
-                            this.displayedVideos = this.getVideos(true,"LOW");
+                            this.displayedVideos = this.getVideos(true, "LOW");
                         }
                     }
-                }
-                else {
+                } else {
                     this.displayedVideos = this.videos;
                 }
                 this.changeVideoSize();
@@ -375,13 +385,12 @@
                 if (this.isHideView) {
                     if (selectedVideosIds.length > 0) {
                         if (selectedVideosIds.length <= 8) {
-                            this.displayedVideos = this.getVideos(false,"HQ");
+                            this.displayedVideos = this.getVideos(false, "HQ");
                         } else {
-                            this.displayedVideos = this.getVideos(false,"LOW");
+                            this.displayedVideos = this.getVideos(false, "LOW");
                         }
                     }
-                }
-                else {
+                } else {
                     this.displayedVideos = this.videos;
                 }
                 this.changeVideoSize();
@@ -402,8 +411,7 @@
                         let jsonUrl = this.videos[i].jsonUrl;
                         if (!jsonUrl.includes("/null")) {
                             window.open(this.videos[i].jsonUrl, "_blank");
-                        }
-                        else console.log("no json attached to video")
+                        } else console.log("no json attached to video")
                     }
                 }
             },
@@ -475,6 +483,7 @@
     #speed {
         width: 50px;
     }
+
     #filesControls {
         display: flex;
         justify-content: flex-end;

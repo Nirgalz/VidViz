@@ -46,6 +46,8 @@
                 </b-col>
                 <b-col cols="1">
                     <H5>{{folderName}}</H5>
+                    <b-btn v-if="isShowInfos" @click="showInfos()"><b-icon-info></b-icon-info></b-btn>
+                    <b-btn v-if="!isShowInfos" @click="showInfos()"><b-icon-info-fill></b-icon-info-fill></b-btn>
                 </b-col>
                 <b-col>
                     <b-form-input v-model="textSearch" size="sm" placeholder="Search for file"
@@ -112,7 +114,9 @@
                            :width="videoWidth"
                            :height="videoHeight">
                     </video>
+
                 </div>
+                {{isShowInfos ? item.fileName : ""}}
             </div>
         </b-row>
     </div>
@@ -133,10 +137,9 @@
                 videoSize: 50,
                 videoWidth: 150,
                 videoHeight: 150,
-                selectedVideos: [],
-                selectedHQVideos: [],
                 isSelectedView: false,
                 isHideView: false,
+                isShowInfos: false,
                 play: false,
                 videoCurrentTime: 0,
                 videoDuration: 0,
@@ -199,6 +202,9 @@
                         this.toggleControls();
                         break;
                 }
+            },
+            showInfos() {
+                this.isShowInfos = !this.isShowInfos;
             },
             increaseSpeed() {
                 this.playSpeed += 1;
@@ -394,10 +400,10 @@
                 for (let i = 0; i < this.videos.length; i++) {
                     if (this.videos[i].selected) {
                         let jsonUrl = this.videos[i].jsonUrl;
-                        console.log(jsonUrl);
                         if (!jsonUrl.includes("/null")) {
                             window.open(this.videos[i].jsonUrl, "_blank");
                         }
+                        else console.log("no json attached to video")
                     }
                 }
             },

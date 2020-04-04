@@ -98,10 +98,10 @@ public class VideoEncodingService {
             for (Directory directory : metadata.getDirectories()) {
                 for (Tag tag : directory.getTags()) {
                     if (tag.getTagName().equals("Width")) {
-                        values.put("originalWith", Integer.parseInt(tag.getDescription().substring(0, tag.getDescription().indexOf(" "))));
+                        values.put("originalWidth", Integer.parseInt(tag.getDescription().substring(0, tag.getDescription().indexOf(" "))));
                     }
                     if (tag.getTagName().equals("Height")) {
-                        values.put("height", Integer.parseInt(tag.getDescription().substring(0, tag.getDescription().indexOf(" "))));
+                        values.put("originalHeight", Integer.parseInt(tag.getDescription().substring(0, tag.getDescription().indexOf(" "))));
                     }
                 }
             }

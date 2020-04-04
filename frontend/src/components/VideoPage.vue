@@ -2,7 +2,7 @@
     <div>
         <b-container>
             <b-row class="selectActions">
-                <b-col>
+                <b-col cols="3">
                     <div id="videoControls">
                         <b-btn v-if="!play"
                                @click="playPauseVideos(true)"
@@ -46,13 +46,27 @@
                             :max="videoDuration">
                     </b-form-input>
                 </b-col>
-                <b-col cols="1">
+                <b-col cols="3">
                     <H5>{{folderName}}</H5>
-                    <b-btn v-if="isShowInfos" @click="showInfos()">
+                    <b-btn v-if="isShowInfos"
+                           @click="showInfos"
+                           v-b-tooltip.hover title="Hide videos infos">
                         <b-icon-info></b-icon-info>
                     </b-btn>
-                    <b-btn v-if="!isShowInfos" @click="showInfos()">
+                    <b-btn v-if="!isShowInfos"
+                           @click="showInfos"
+                           v-b-tooltip.hover title="Show videos infos">
                         <b-icon-info-fill></b-icon-info-fill>
+                    </b-btn>
+                    <b-btn v-if="isContextualMenu"
+                           @click="allowContextualMenu"
+                           v-b-tooltip.hover title="Allow contextual menu [W]">
+                        <b-icon-cursor-fill></b-icon-cursor-fill>
+                    </b-btn>
+                    <b-btn v-if="!isContextualMenu"
+                           @click="allowContextualMenu"
+                           v-b-tooltip.hover title="Deactivate contextual menu [W]">
+                        <b-icon-cursor></b-icon-cursor>
                     </b-btn>
                 </b-col>
                 <b-col>
@@ -63,7 +77,7 @@
                                   placeholder="Search for file"
                                   @update="searchFile"></b-form-input>
                     <div id="filesControls">
-                        <p>{{getSelectedVideosIds().length}} videos selected from {{videos.length}} videos </p>
+                        <p>selected {{getSelectedVideosIds().length}} / {{videos.length}} videos </p>
                         <b-btn @click="unSelectAll"
                                :disabled="isSelectedView || isHideView"
                                v-b-tooltip.hover title="Unselect all elements [C]">
@@ -144,10 +158,6 @@
                 <b-icon-download></b-icon-download>
                 Download Json
             </li>
-            <li @click="deleteSelection">
-                <b-icon-trash-fill></b-icon-trash-fill>
-                Delete File
-            </li>
         </ul>
     </div>
 </template>
@@ -184,7 +194,8 @@
                 viewMenu: false,
                 top: '0px',
                 left: '0px',
-                rightClickedItem: null
+                rightClickedItem: null,
+                isContextualMenu: true
             }
         },
         created() {
@@ -210,68 +221,76 @@
                 this.rightClickedItem = null;
             },
             openMenu(e, item) {
-                this.viewMenu = true;
-                this.rightClickedItem = item;
-                this.$nextTick(function () {
-                    this.$refs.right.focus();
+                if (this.isContextualMenu) {
+                    this.viewMenu = true;
+                    this.rightClickedItem = item;
+                    this.$nextTick(function () {
+                        this.$refs.right.focus();
 
-                    this.setMenu(e.y, e.x)
-                }.bind(this));
-                e.preventDefault();
+                        this.setMenu(e.y, e.x)
+                    }.bind(this));
+                    e.preventDefault();
+                }
             },
             openFileInFolder() {
                 UploadService.openFileInFolder(this.rightClickedItem.id);
             },
             doCommand(e) {
                 if (this.isShortcutEnabled)
-                    // console.log(e.keyCode);
-                    switch (e.keyCode) {
-                        case 32 :
-                            e.preventDefault();
-                            this.playPauseVideos(!this.play);
-                            break;
-                        case 99 :
-                            if (!this.isHideView && !this.isSelectedView) {
-                                this.unSelectAll();
-                            }
-                            break;
-                        case 118 :
-                            if (!this.isHideView && !this.isSelectedView) {
-                                this.viewSelection(true);
-                            } else {
-                                this.viewSelection(false);
-                            }
-                            break;
-                        case 98 :
-                            if (!this.isHideView && !this.isSelectedView) {
-                                this.hideSelection(true);
-                            } else {
-                                this.hideSelection(false);
-                            }
-                            break;
-                        case 106 :
-                            if (!this.isHideView && !this.isSelectedView) {
-                                this.downloadJson();
-                            }
-                            break;
-                        case 115 :
-                            if (!this.isHideView && !this.isSelectedView) {
-                                this.deleteSelection();
-                            }
-                            break;
-                        case 108 :
-                            this.toggleAutoLoop();
-                            break;
-                        case 109 :
-                            this.toggleControls();
-                            break;
-                        case 45 :
-                            this.decreaseSpeed();
-                            break;
-                        case 43 :
-                            this.increaseSpeed();
-                            break;
-                    }
+                    console.log(e.keyCode);
+                switch (e.keyCode) {
+                    case 32 :
+                        e.preventDefault();
+                        this.playPauseVideos(!this.play);
+                        break;
+                    case 99 :
+                        if (!this.isHideView && !this.isSelectedView) {
+                            this.unSelectAll();
+                        }
+                        break;
+                    case 118 :
+                        if (!this.isHideView && !this.isSelectedView) {
+                            this.viewSelection(true);
+                        } else {
+                            this.viewSelection(false);
+                        }
+                        break;
+                    case 98 :
+                        if (!this.isHideView && !this.isSelectedView) {
+                            this.hideSelection(true);
+                        } else {
+                            this.hideSelection(false);
+                        }
+                        break;
+                    case 106 :
+                        if (!this.isHideView && !this.isSelectedView) {
+                            this.downloadJson();
+                        }
+                        break;
+                    case 115 :
+                        if (!this.isHideView && !this.isSelectedView) {
+                            this.deleteSelection();
+                        }
+                        break;
+                    case 108 :
+                        this.toggleAutoLoop();
+                        break;
+                    case 109 :
+                        this.toggleControls();
+                        break;
+                    case 45 :
+                        this.decreaseSpeed();
+                        break;
+                    case 43 :
+                        this.increaseSpeed();
+                        break;
+                    case 119 :
+                        this.allowContextualMenu();
+                        break;
+                }
+            },
+            allowContextualMenu() {
+                this.isContextualMenu = !this.isContextualMenu;
             },
             showInfos() {
                 this.isShowInfos = !this.isShowInfos;
@@ -461,28 +480,13 @@
                 this.changeVideoSize();
             },
             deleteSelection() {
-                if (this.rightClickedItem === null) {
-                    for (let i = 0; i < this.videos.length; i++) {
-                        if (this.videos[i].selected) {
-                            UploadService.deleteFile(this.videos[i].id);
-                            let tile = "tile-" + i;
-                            this.$refs[tile][0].style.display = "none";
-                        }
+                for (let i = 0; i < this.videos.length; i++) {
+                    if (this.videos[i].selected) {
+                        UploadService.deleteFile(this.videos[i].id);
+                        let tile = "tile-" + i;
+                        this.$refs[tile][0].style.display = "none";
                     }
-                } else {
-                    UploadService.deleteFile(this.rightClickedItem.id);
-                    let tileId = null;
-                    for (let i = 0 ; i < this.displayedVideos.length ; i++) {
-                        if (this.displayedVideos[i].id === this.rightClickedItem.id) {
-                            tileId = i;
-                        }
-                    }
-
-                    let tile = "tile-" + tileId;
-                    this.$refs[tile][0].style.display = "none";
-                    this.closeMenu();
                 }
-
                 this.loadFiles();
             },
             downloadJson() {

@@ -34,7 +34,6 @@
                 this.loading = true;
                 UploadService.getNewFolders().then(response => {
                     this.loading = false;
-                    console.log(this.loading);
                     this.folders = response.data;
                 })
             }

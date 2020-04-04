@@ -56,7 +56,11 @@
                     </b-btn>
                 </b-col>
                 <b-col>
-                    <b-form-input v-model="textSearch" size="sm" placeholder="Search for file"
+                    <b-form-input v-model="textSearch"
+                                  @focusin="isShortcutEnabled = false"
+                                  @focusout="isShortcutEnabled = true"
+                                  size="sm"
+                                  placeholder="Search for file"
                                   @update="searchFile"></b-form-input>
                     <div id="filesControls">
                         <p>{{getSelectedVideosIds().length}} videos selected from {{videos.length}} videos </p>
@@ -152,6 +156,7 @@
                 refreshVideoFunc: null,
                 startTime: 0,
                 textSearch: "",
+                isShortcutEnabled : true,
                 isAutoLoop: false,
                 isControlsVisible: false,
                 playSpeed: 1,
@@ -166,6 +171,7 @@
         },
         methods: {
             doCommand(e) {
+                if (this.isShortcutEnabled)
                 console.log(e.keyCode);
                 switch (e.keyCode) {
                     case 32 :

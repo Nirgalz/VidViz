@@ -64,5 +64,8 @@ class UploadFilesService {
     encodeFolder(name) {
         return http.get("action/folder/encode/"+name);
     }
+    openFileInFolder(id) {
+        return http.get("action/file/openexplorer/"+id)
+    }
 }
 export default new UploadFilesService();

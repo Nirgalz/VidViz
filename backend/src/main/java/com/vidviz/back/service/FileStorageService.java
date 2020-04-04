@@ -32,4 +32,6 @@ public interface FileStorageService {
     String getVideosfolder();
 
     boolean isFolderExists(String name);
+
+    String getAbsolutePath(String s);
 }

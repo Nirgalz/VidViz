@@ -20,8 +20,8 @@
                             <b-icon-dash></b-icon-dash>
                         </b-btn>
                         <b-form-input id="speed" v-model="playSpeed" @change="updateVideoSpeed"></b-form-input>
-                        <b-btn  @click="increaseSpeed"
-                                v-b-tooltip.hover title="Increase speed [NUMPAD +]">
+                        <b-btn @click="increaseSpeed"
+                               v-b-tooltip.hover title="Increase speed [NUMPAD +]">
                             <b-icon-plus></b-icon-plus>
                         </b-btn>
                         |
@@ -109,6 +109,7 @@
         </b-container>
         <b-row class="videoContainer">
             <div v-for="(item, index) in displayedVideos"
+                 @contextmenu="openMenu($event, item)"
                  :key="index"
                  class="videoBox"
                  :ref="'tile-'+index"
@@ -128,11 +129,26 @@
                 </div>
                 {{isShowInfos ? truncate(item.fileName, videoWidth /8) : ""}}
                 <br v-if="isShowInfos">
-                {{isShowInfos ? players[index].videoWidth  + "/" + players[index].videoHeight: ""}}
+                {{isShowInfos ? players[index].videoWidth + "/" + players[index].videoHeight: ""}}
                 <br v-if="isShowInfos">
                 {{isShowInfos ? players[index].duration.toFixed(2) : ""}}
             </div>
         </b-row>
+        <ul id="right-click-menu" ref="right" tabindex="-1" v-if="viewMenu" @focusout="closeMenu"
+            v-bind:style="{top :top, left:left}">
+            <li @click="openFileInFolder">
+                <b-icon-folder-symlink-fill></b-icon-folder-symlink-fill>
+                Open file in folder
+            </li>
+            <li @click="downloadJson">
+                <b-icon-download></b-icon-download>
+                Download Json
+            </li>
+            <li @click="deleteSelection">
+                <b-icon-trash-fill></b-icon-trash-fill>
+                Delete File
+            </li>
+        </ul>
     </div>
 </template>
 
@@ -160,11 +176,15 @@
                 refreshVideoFunc: null,
                 startTime: 0,
                 textSearch: "",
-                isShortcutEnabled : true,
+                isShortcutEnabled: true,
                 isAutoLoop: false,
                 isControlsVisible: false,
                 playSpeed: 1,
-                ratio: 0
+                ratio: 0,
+                viewMenu: false,
+                top: '0px',
+                left: '0px',
+                rightClickedItem: null
             }
         },
         created() {
@@ -174,56 +194,84 @@
             window.removeEventListener('keypress', this.doCommand);
         },
         methods: {
+            setMenu(top, left) {
+
+                let largestHeight = window.innerHeight - this.$refs.right.offsetHeight - 25;
+                let largestWidth = window.innerWidth - this.$refs.right.offsetWidth - 25;
+
+                if (top > largestHeight) top = largestHeight;
+                if (left > largestWidth) left = largestWidth;
+
+                this.top = top + 'px';
+                this.left = left + 'px';
+            },
+            closeMenu() {
+                this.viewMenu = false;
+                this.rightClickedItem = null;
+            },
+            openMenu(e, item) {
+                this.viewMenu = true;
+                this.rightClickedItem = item;
+                this.$nextTick(function () {
+                    this.$refs.right.focus();
+
+                    this.setMenu(e.y, e.x)
+                }.bind(this));
+                e.preventDefault();
+            },
+            openFileInFolder() {
+                UploadService.openFileInFolder(this.rightClickedItem.id);
+            },
             doCommand(e) {
                 if (this.isShortcutEnabled)
-                // console.log(e.keyCode);
-                switch (e.keyCode) {
-                    case 32 :
-                        e.preventDefault();
-                        this.playPauseVideos(!this.play);
-                        break;
-                    case 99 :
-                        if (!this.isHideView && !this.isSelectedView) {
-                            this.unSelectAll();
-                        }
-                        break;
-                    case 118 :
-                        if (!this.isHideView && !this.isSelectedView) {
-                            this.viewSelection(true);
-                        } else {
-                            this.viewSelection(false);
-                        }
-                        break;
-                    case 98 :
-                        if (!this.isHideView && !this.isSelectedView) {
-                            this.hideSelection(true);
-                        } else {
-                            this.hideSelection(false);
-                        }
-                        break;
-                    case 106 :
-                        if (!this.isHideView && !this.isSelectedView) {
-                            this.downloadJson();
-                        }
-                        break;
-                    case 115 :
-                        if (!this.isHideView && !this.isSelectedView) {
-                            this.deleteSelection();
-                        }
-                        break;
-                    case 108 :
-                        this.toggleAutoLoop();
-                        break;
-                    case 109 :
-                        this.toggleControls();
-                        break;
-                    case 45 :
-                        this.decreaseSpeed();
-                        break;
-                    case 43 :
-                        this.increaseSpeed();
-                        break;
-                }
+                    // console.log(e.keyCode);
+                    switch (e.keyCode) {
+                        case 32 :
+                            e.preventDefault();
+                            this.playPauseVideos(!this.play);
+                            break;
+                        case 99 :
+                            if (!this.isHideView && !this.isSelectedView) {
+                                this.unSelectAll();
+                            }
+                            break;
+                        case 118 :
+                            if (!this.isHideView && !this.isSelectedView) {
+                                this.viewSelection(true);
+                            } else {
+                                this.viewSelection(false);
+                            }
+                            break;
+                        case 98 :
+                            if (!this.isHideView && !this.isSelectedView) {
+                                this.hideSelection(true);
+                            } else {
+                                this.hideSelection(false);
+                            }
+                            break;
+                        case 106 :
+                            if (!this.isHideView && !this.isSelectedView) {
+                                this.downloadJson();
+                            }
+                            break;
+                        case 115 :
+                            if (!this.isHideView && !this.isSelectedView) {
+                                this.deleteSelection();
+                            }
+                            break;
+                        case 108 :
+                            this.toggleAutoLoop();
+                            break;
+                        case 109 :
+                            this.toggleControls();
+                            break;
+                        case 45 :
+                            this.decreaseSpeed();
+                            break;
+                        case 43 :
+                            this.increaseSpeed();
+                            break;
+                    }
             },
             showInfos() {
                 this.isShowInfos = !this.isShowInfos;
@@ -413,23 +461,45 @@
                 this.changeVideoSize();
             },
             deleteSelection() {
-                for (let i = 0; i < this.videos.length; i++) {
-                    if (this.videos[i].selected) {
-                        UploadService.deleteFile(this.videos[i].id);
-                        let tile = "tile-" + i;
-                        this.$refs[tile][0].style.display = "none";
+                if (this.rightClickedItem === null) {
+                    for (let i = 0; i < this.videos.length; i++) {
+                        if (this.videos[i].selected) {
+                            UploadService.deleteFile(this.videos[i].id);
+                            let tile = "tile-" + i;
+                            this.$refs[tile][0].style.display = "none";
+                        }
                     }
+                } else {
+                    UploadService.deleteFile(this.rightClickedItem.id);
+                    let tileId = null;
+                    for (let i = 0 ; i < this.displayedVideos.length ; i++) {
+                        if (this.displayedVideos[i].id === this.rightClickedItem.id) {
+                            tileId = i;
+                        }
+                    }
+
+                    let tile = "tile-" + tileId;
+                    this.$refs[tile][0].style.display = "none";
+                    this.closeMenu();
                 }
+
                 this.loadFiles();
             },
             downloadJson() {
-                for (let i = 0; i < this.videos.length; i++) {
-                    if (this.videos[i].selected) {
-                        let jsonUrl = this.videos[i].jsonUrl;
-                        if (!jsonUrl.includes("/null")) {
-                            window.open(this.videos[i].jsonUrl, "_blank");
-                        } else console.log("no json attached to video")
+                if (this.rightClickedItem === null) {
+                    for (let i = 0; i < this.videos.length; i++) {
+                        if (this.videos[i].selected) {
+                            let jsonUrl = this.videos[i].jsonUrl;
+                            if (!jsonUrl.includes("/null")) {
+                                window.open(this.videos[i].jsonUrl, "_blank");
+                            } else console.log("no json attached to video")
+                        }
                     }
+                } else {
+                    if (!this.rightClickedItem.jsonUrl.includes("/null")) {
+                        window.open(this.rightClickedItem.jsonUrl, "_blank");
+                    } else console.log("no json attached to video")
+
                 }
             },
             refreshVideoProgress(bool) {
@@ -508,5 +578,34 @@
 
     #videoControls {
         display: flex;
+    }
+
+    #right-click-menu {
+        background: #87939a;
+        border: 1px solid #d6e5ef;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12);
+        display: block;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        position: absolute;
+        width: 250px;
+        z-index: 999999;
+        text-align: left;
+    }
+
+    #right-click-menu li {
+        border-bottom: 1px solid #E0E0E0;
+        margin: 0;
+        padding: 5px 35px;
+    }
+
+    #right-click-menu li:last-child {
+        border-bottom: none;
+    }
+
+    #right-click-menu li:hover {
+        background: #d6e5ef;
+        color: #67757f;
     }
 </style>

@@ -109,4 +109,10 @@ public class FileStorageServiceImpl implements FileStorageService {
         File folder = new File(VIDEOSFOLDER+folderName);
         return folder.list();
     }
+
+    @Override
+    public String getAbsolutePath(String s) {
+        File file = new File(VIDEOSFOLDER + s);
+        return file.getAbsolutePath();
+    }
 }

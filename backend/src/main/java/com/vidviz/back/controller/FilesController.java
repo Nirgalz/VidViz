@@ -99,6 +99,22 @@ public class FilesController {
         return ResponseEntity.status(HttpStatus.OK).body(foldersFront);
     }
 
+    @GetMapping("api/action/file/openexplorer/{id:.+}")
+    @ResponseBody
+    public ResponseEntity<ResponseMessage> openFileInExplorer(@PathVariable Long id) {
+        Optional<Video> video = videoService.findById(id);
+        video.ifPresent(video1 -> {
+            try {
+                String absolutePath = storageService.getAbsolutePath(video1.getFolder().getName() + "/" + video1.getName());
+                Runtime.getRuntime().exec("explorer.exe /select," + absolutePath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("folder opened"));
+    }
+
     @GetMapping("api/folder/{folder:.+}")
     @ResponseBody
     public ResponseEntity<List<VideoFront>> getFilesByFolder(@PathVariable String folder) {

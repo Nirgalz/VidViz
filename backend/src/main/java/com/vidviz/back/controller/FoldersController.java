@@ -5,6 +5,7 @@ import com.vidviz.back.model.ResponseMessage;
 import com.vidviz.back.model.Video;
 import com.vidviz.back.service.FileStorageService;
 import com.vidviz.back.service.FolderService;
+import com.vidviz.back.service.VideoEncodingService;
 import com.vidviz.back.service.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,6 +37,8 @@ public class FoldersController {
 
     @Autowired
     private FolderService folderService;
+
+    private VideoEncodingService videoEncodingService = new VideoEncodingService();
 
     @GetMapping("api/action/scan")
     public ResponseEntity<ResponseMessage> scanFolders() {
@@ -90,10 +93,23 @@ public class FoldersController {
                     video.setJson(fileName);
                     videoService.saveVideo(video);
                 }
+                encodeFolder(folderName);
             }
         });
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseMessage("Updated : " + foldersDeleted + " folders were deleted and " + newFolderCount.get() + " folders were added."));
+    }
+
+    public void encodeFolder( String folder) {
+        List<Video> videos = folderService.getFolderByName(folder).getVideos();
+        for (Video video : videos) {
+            try {
+
+                videoEncodingService.encodeVideo(Paths.get(folder), video.getName());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

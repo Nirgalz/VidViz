@@ -84,6 +84,7 @@ public class FilesController {
             videoService.saveVideo(video);
 
         }
+        encodeFolder(folderName);
 
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
     }
@@ -137,9 +138,8 @@ public class FilesController {
         return ResponseEntity.status(HttpStatus.OK).body(filesFront);
     }
 
-    @GetMapping("api/action/folder/encode/{folder:.+}")
-    @ResponseBody
-    public ResponseEntity<ResponseMessage> encodeFolder(@PathVariable String folder) {
+
+    public void encodeFolder( String folder) {
         List<Video> videos = folderService.getFolderByName(folder).getVideos();
         for (Video video : videos) {
             try {
@@ -148,7 +148,6 @@ public class FilesController {
                 e.printStackTrace();
             }
         }
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage("folder encoded"));
     }
 
     @PostMapping("api/action/folders/rename/")

@@ -1,20 +1,19 @@
 <template>
     <div>
-        <p v-if="folders.length === 0">
-            No new folders detected
-        </p>
-        <p v-if="folders.length> 0">
-            The following folders have been detected, import them ?
-            <b-btn variant="success" @click="processFolders"><b-icon-arrow-right ></b-icon-arrow-right> </b-btn>
-        </p>
-        {{message}}
-        <ul>
-            <li v-for="folder in folders" :key="folder.name">
-                {{folder}}
-            </li>
-        </ul>
+        <div v-if="!loading">
+            <p v-if="folders.length === 0">
+                No new folders detected
+            </p>
+            {{message}}
+            <ul>
+                <li v-for="folder in folders" :key="folder.name">
+                    {{folder}}
+                </li>
+            </ul>
+            <b-btn @click="getFolders">Refresh <b-icon-arrow-repeat></b-icon-arrow-repeat></b-btn>
+        </div>
 
-        <b-btn @click="getFolders">Refresh <b-icon-arrow-repeat></b-icon-arrow-repeat></b-btn>
+        <b-spinner v-if="loading" id="spinner" variant="secondary"></b-spinner>
     </div>
 </template>
 
@@ -26,18 +25,16 @@
         data() {
             return {
                 folders: [],
-                message: ""
+                message: "",
+                loading : false
             }
         },
         methods: {
-            processFolders() {
-                UploadService.processFolders().then(response => {
-                    this.message = response.data.message;
-                    this.getFolders();
-                });
-            },
             getFolders() {
+                this.loading = true;
                 UploadService.getNewFolders().then(response => {
+                    this.loading = false;
+                    console.log(this.loading);
                     this.folders = response.data;
                 })
             }
@@ -49,5 +46,9 @@
 </script>
 
 <style scoped>
-
+    #spinner {
+        position: absolute;
+        top: 45px;
+        left: 50%;
+    }
 </style>

@@ -126,7 +126,7 @@
                     </video>
 
                 </div>
-                {{isShowInfos ? item.fileName : ""}}
+                {{isShowInfos ? truncate(item.fileName, videoWidth /8) : ""}}
             </div>
         </b-row>
     </div>
@@ -223,6 +223,12 @@
             },
             showInfos() {
                 this.isShowInfos = !this.isShowInfos;
+            },
+            truncate(value, limit) {
+                if (value.length > limit) {
+                    value = value.substring(0, (limit - 3)) + '...';
+                }
+                return value
             },
             increaseSpeed() {
                 this.playSpeed += 1;

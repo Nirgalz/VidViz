@@ -19,7 +19,7 @@
                                v-b-tooltip.hover title="Decrease speed [NUMPAD -]">
                             <b-icon-dash></b-icon-dash>
                         </b-btn>
-                        <b-form-input id="speed" v-model="playSpeed"></b-form-input>
+                        <b-form-input id="speed" v-model="playSpeed" @change="updateVideoSpeed"></b-form-input>
                         <b-btn  @click="increaseSpeed"
                                 v-b-tooltip.hover title="Increase speed [NUMPAD +]">
                             <b-icon-plus></b-icon-plus>
@@ -172,7 +172,7 @@
         methods: {
             doCommand(e) {
                 if (this.isShortcutEnabled)
-                console.log(e.keyCode);
+                // console.log(e.keyCode);
                 switch (e.keyCode) {
                     case 32 :
                         e.preventDefault();
@@ -226,13 +226,14 @@
             },
             increaseSpeed() {
                 this.playSpeed += 1;
-                for (let i = 0; i < this.players.length; i++) {
-                    this.players[i].playbackRate = this.playSpeed;
-                }
+                this.updateVideoSpeed();
             },
             decreaseSpeed() {
                 this.playSpeed -= 1;
                 this.playSpeed < 1 ? this.playSpeed = 1 : this.playSpeed;
+                this.updateVideoSpeed();
+            },
+            updateVideoSpeed() {
                 for (let i = 0; i < this.players.length; i++) {
                     this.players[i].playbackRate = this.playSpeed;
                 }
@@ -252,7 +253,7 @@
             searchFile() {
                 this.unSelectAll();
                 for (let i = 0; i < this.videos.length; i++) {
-                    if (this.videos[i].fileName.includes(this.textSearch)) {
+                    if (this.videos[i].fileName.toLowerCase().includes(this.textSearch.toLowerCase())) {
                         this.selectTile(i);
                     }
                 }

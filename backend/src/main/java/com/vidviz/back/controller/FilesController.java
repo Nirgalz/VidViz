@@ -89,17 +89,6 @@ public class FilesController {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
     }
 
-    @GetMapping("api/folders")
-    public ResponseEntity<List<FolderFront>> getListFolders() {
-        List<Folder> folders = folderService.findAll();
-        List<FolderFront> foldersFront = new ArrayList<>();
-        for (Folder folder : folders) {
-            foldersFront.add(new FolderFront(folder.getName(), folder.getNumberOfFiles(), folder.getCreated()));
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).body(foldersFront);
-    }
-
     @GetMapping("api/action/file/openexplorer/{id:.+}")
     @ResponseBody
     public ResponseEntity<ResponseMessage> openFileInExplorer(@PathVariable Long id) {

@@ -1,6 +1,7 @@
 package com.vidviz.back.controller;
 
 import com.vidviz.back.model.Folder;
+import com.vidviz.back.model.FolderFront;
 import com.vidviz.back.model.ResponseMessage;
 import com.vidviz.back.model.Video;
 import com.vidviz.back.service.FileStorageService;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -39,6 +41,19 @@ public class FoldersController {
     private FolderService folderService;
 
     private VideoEncodingService videoEncodingService = new VideoEncodingService();
+
+    @GetMapping("api/folders")
+    public ResponseEntity<List<FolderFront>> getListFolders(@RequestParam(defaultValue = "0") Integer pageNo,
+                                                            @RequestParam(defaultValue = "1000") Integer pageSize,
+                                                            @RequestParam(defaultValue = "id") String sortBy) {
+        List<Folder> folders = folderService.findAllPaginated(pageNo, pageSize, sortBy);
+        List<FolderFront> foldersFront = new ArrayList<>();
+        for (Folder folder : folders) {
+            foldersFront.add(new FolderFront(folder.getName(), folder.getNumberOfFiles(), folder.getCreated()));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(foldersFront);
+    }
 
     @GetMapping("api/action/scan")
     public ResponseEntity<ResponseMessage> scanFolders() {

@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class VideoEncodingService {
@@ -26,44 +27,29 @@ public class VideoEncodingService {
 
         Path outputPath;
         //Path source = Paths.get("uploads/"+folder.getFileName() + "/" + fileName);
-        if (!Files.exists(Paths.get("videos/"+folder.getFileName() + "/thumbnails"))) {
-            Files.createDirectory(Paths.get("videos/"+folder.getFileName() + "/thumbnails"));
+        if (!Files.exists(Paths.get("videos/" + folder.getFileName() + "/thumbnails"))) {
+            Files.createDirectory(Paths.get("videos/" + folder.getFileName() + "/thumbnails"));
         }
-        outputPath = Paths.get("videos/"+folder.getFileName() + "/thumbnails/" + fileName);
+        outputPath = Paths.get("videos/" + folder.getFileName() + "/thumbnails/" + fileName);
 
-        File source = new File("videos/"+folder.getFileName() + "/" + fileName);
-        File target = new File("videos/"+folder.getFileName() + "/thumbnails/" + fileName);
+        File source = new File("videos/" + folder.getFileName() + "/" + fileName);
+        File target = new File("videos/" + folder.getFileName() + "/thumbnails/" + fileName);
 
         float originalWidth = 0;
         float originalHeight = 0;
         int width = 0;
         int height = 0;
 
-        try {
-            Metadata metadata = ImageMetadataReader.readMetadata(source);
-
-            for (Directory directory : metadata.getDirectories()) {
-                for (Tag tag : directory.getTags()) {
-                    if (tag.getTagName().equals("Width")){
-                        originalWidth = Integer.parseInt(tag.getDescription().substring(0, tag.getDescription().indexOf(" ")));
-                    }
-                    if (tag.getTagName().equals("Height")){
-                        originalHeight = Integer.parseInt(tag.getDescription().substring(0, tag.getDescription().indexOf(" ")));
-                    }
-                }
-            }
-            System.out.println(originalHeight +" " + originalWidth);
-        } catch (ImageProcessingException e) {
-            e.printStackTrace();
-        }
+        HashMap<String, Integer> metadata = getMetadata(source);
+        originalWidth = metadata.get("originalWidth");
+        originalHeight = metadata.get("originalHeight");
 
         float ratio = originalWidth / originalHeight;
 
         if (ratio == 1) {
             width = 500;
             height = 500;
-        }
-        else {
+        } else {
             height = 1024;
             width = 768;
         }
@@ -97,10 +83,31 @@ public class VideoEncodingService {
         try {
             Encoder encoder = new Encoder();
 
-            encoder.encode( new MultimediaObject(source) , target, attrs);
+            encoder.encode(new MultimediaObject(source), target, attrs);
         } catch (Exception e) {
             /*Handle here the video failure*/
             e.printStackTrace();
         }
+    }
+
+    private HashMap<String, Integer> getMetadata(File source) {
+        HashMap<String, Integer> values = new HashMap<String, Integer>();
+        try {
+            Metadata metadata = ImageMetadataReader.readMetadata(source);
+
+            for (Directory directory : metadata.getDirectories()) {
+                for (Tag tag : directory.getTags()) {
+                    if (tag.getTagName().equals("Width")) {
+                        values.put("originalWith", Integer.parseInt(tag.getDescription().substring(0, tag.getDescription().indexOf(" "))));
+                    }
+                    if (tag.getTagName().equals("Height")) {
+                        values.put("height", Integer.parseInt(tag.getDescription().substring(0, tag.getDescription().indexOf(" "))));
+                    }
+                }
+            }
+        } catch (ImageProcessingException | IOException e) {
+            e.printStackTrace();
+        }
+        return values;
     }
 }

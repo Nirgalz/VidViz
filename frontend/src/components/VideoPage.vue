@@ -127,6 +127,10 @@
 
                 </div>
                 {{isShowInfos ? truncate(item.fileName, videoWidth /8) : ""}}
+                <br v-if="isShowInfos">
+                {{isShowInfos ? players[index].videoWidth  + "/" + players[index].videoHeight: ""}}
+                <br v-if="isShowInfos">
+                {{isShowInfos ? players[index].duration.toFixed(2) : ""}}
             </div>
         </b-row>
     </div>

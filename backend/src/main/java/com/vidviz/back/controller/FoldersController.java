@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ws.schild.jave.EncoderException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -116,13 +117,14 @@ public class FoldersController {
                 new ResponseMessage("Updated : " + foldersDeleted + " folders were deleted and " + newFolderCount.get() + " folders were added."));
     }
 
+    @GetMapping("api/action/folder/encode")
     public void encodeFolder( String folder) {
         List<Video> videos = folderService.getFolderByName(folder).getVideos();
         for (Video video : videos) {
             try {
 
                 videoEncodingService.encodeVideo(Paths.get(folder), video.getName());
-            } catch (IOException e) {
+            } catch (IOException | EncoderException e) {
                 e.printStackTrace();
             }
         }

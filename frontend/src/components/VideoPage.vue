@@ -2,7 +2,7 @@
     <div>
         <b-container>
             <b-row class="selectActions">
-                <b-col cols="3">
+                <b-col cols="4">
                     <div id="videoControls">
                         <b-btn v-if="!play"
                                @click="playPauseVideos(true)"
@@ -69,7 +69,7 @@
                         <b-icon-cursor></b-icon-cursor>
                     </b-btn>
                 </b-col>
-                <b-col>
+                <b-col cols="5">
                     <b-form-input v-model="textSearch"
                                   @focusin="isShortcutEnabled = false"
                                   @focusout="isShortcutEnabled = true"

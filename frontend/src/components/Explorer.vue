@@ -31,11 +31,11 @@
                        v-b-tooltip.hover title="Delete">
                     <b-icon-trash-fill></b-icon-trash-fill>
                 </b-btn>
-                |
-                <b-btn @click="encodeFolder(data.item.name)"
-                       v-b-tooltip.hover title="Encode">
-                    encode
-                </b-btn>
+<!--                |-->
+<!--                <b-btn @click="encodeFolder(data.item.name)"-->
+<!--                       v-b-tooltip.hover title="Encode">-->
+<!--                    encode-->
+<!--                </b-btn>-->
             </template>
         </b-table>
         <b-pagination

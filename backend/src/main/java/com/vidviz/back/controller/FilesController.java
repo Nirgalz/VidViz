@@ -22,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ws.schild.jave.EncoderException;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
@@ -133,7 +134,7 @@ public class FilesController {
         for (Video video : videos) {
             try {
                 videoEncodingService.encodeVideo(Paths.get(folder), video.getName());
-            } catch (IOException e) {
+            } catch (IOException | EncoderException e) {
                 e.printStackTrace();
             }
         }

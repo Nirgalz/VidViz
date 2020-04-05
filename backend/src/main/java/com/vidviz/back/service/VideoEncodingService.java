@@ -1,13 +1,5 @@
 package com.vidviz.back.service;
 
-import com.drew.imaging.ImageMetadataReader;
-import com.drew.imaging.ImageProcessingException;
-import com.drew.metadata.Directory;
-import com.drew.metadata.Metadata;
-import com.drew.metadata.StringValue;
-import com.drew.metadata.Tag;
-import com.drew.metadata.exif.ExifSubIFDDirectory;
-import com.drew.metadata.mp4.media.Mp4VideoDirectory;
 import ws.schild.jave.*;
 
 import java.io.File;
@@ -15,15 +7,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 public class VideoEncodingService {
 
     private Path BIN = Paths.get("ffmpeg/bin");
 
-    public void encodeVideo(Path folder, String fileName) throws IOException {
+    public void encodeVideo(Path folder, String fileName) throws IOException, EncoderException {
 
         Path outputPath;
         //Path source = Paths.get("uploads/"+folder.getFileName() + "/" + fileName);
@@ -40,9 +29,11 @@ public class VideoEncodingService {
         int width = 0;
         int height = 0;
 
-        HashMap<String, Integer> metadata = getMetadata(source);
-        originalWidth = metadata.get("originalWidth");
-        originalHeight = metadata.get("originalHeight");
+        MultimediaObject multimediaObject = new MultimediaObject(source);
+        MultimediaInfo infos= multimediaObject.getInfo();
+
+        originalWidth = infos.getVideo().getSize().getWidth();
+        originalHeight = infos.getVideo().getSize().getHeight();
 
         float ratio = originalWidth / originalHeight;
 
@@ -88,26 +79,5 @@ public class VideoEncodingService {
             /*Handle here the video failure*/
             e.printStackTrace();
         }
-    }
-
-    private HashMap<String, Integer> getMetadata(File source) {
-        HashMap<String, Integer> values = new HashMap<String, Integer>();
-        try {
-            Metadata metadata = ImageMetadataReader.readMetadata(source);
-
-            for (Directory directory : metadata.getDirectories()) {
-                for (Tag tag : directory.getTags()) {
-                    if (tag.getTagName().equals("Width")) {
-                        values.put("originalWidth", Integer.parseInt(tag.getDescription().substring(0, tag.getDescription().indexOf(" "))));
-                    }
-                    if (tag.getTagName().equals("Height")) {
-                        values.put("originalHeight", Integer.parseInt(tag.getDescription().substring(0, tag.getDescription().indexOf(" "))));
-                    }
-                }
-            }
-        } catch (ImageProcessingException | IOException e) {
-            e.printStackTrace();
-        }
-        return values;
     }
 }

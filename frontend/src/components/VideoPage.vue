@@ -532,7 +532,7 @@
                         }
                     }
                     if (this.videos.length === 0) {
-                        this.videos.push(this.videosHQ)
+                        this.videos = this.videosHQ;
                     }
 
                     this.displayedVideos = this.videos;

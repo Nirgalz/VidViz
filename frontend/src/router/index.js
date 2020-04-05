@@ -11,28 +11,46 @@ const routes = [
   {
     path: '/explorer',
     name: 'Explorer',
-    component: Explorer
+    component: Explorer,
+    meta : {
+      title: "Explorer"
+    }
   },
   {
     path: '/upload',
     name: 'Upload',
-    component: UploadFiles
+    component: UploadFiles,
+    meta : {
+      title: "Upload"
+    }
   },
   {
     path: '/scan',
     name: 'Scan',
-    component: Import
+    component: Import,
+    meta : {
+      title: "Scan folder"
+    }
   },
   {
     path: '/video/:folder',
     name: 'Videos',
-    component: VideoPage
+    component: VideoPage,
+    meta : {
+      title: "Videos view"
+    }
   },
 ]
+
 
 const router = new VueRouter({
   mode: 'history',
   routes
 })
+router.afterEach((to) => {
+  if (to.meta && to.meta.title) {
+    document.title = to.meta.title + ' | VidViz';
+  }
+});
 
 export default router

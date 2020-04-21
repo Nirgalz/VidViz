@@ -24,3 +24,29 @@ As of now, it is primarily designed to be used as a local tool.
 * Online version with security
 * SAAS service
 ...
+
+
+### Install
+For windows :
+[Download the latest release.](https://github.com/Nirgalz/VidViz/releases)
+
+* run in cmd : 
+```
+<jar path>/java -jar backend-0.2.1-SNAPSHOT.jar
+```
+   
+* Visit [http://localhost:8080/](http://localhost:8080/)
+
+I haven't tried it yet on linux, there may be a few tweaks to do to get it to work.
+
+### Dev environment
+
+Clone the repo and run
+```
+mvn install
+```
+
+### Reminder 
+
+Don't deploy it live, there is no security and anyone accessing the url would have total control over your files.
+It is meant to be used on a local computer only for now.

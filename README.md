@@ -1,3 +1,4 @@
+#Video assets management tool
 
 Developed specifically for a VFX artist to facilitate his workflow, but generalist enough to be used in various cases where one wants to visualize and control multiple videos at the same time, or simply better manage a video library.
 As of now, it is primarily designed to be used as a local tool.
